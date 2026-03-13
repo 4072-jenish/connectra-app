@@ -4,37 +4,86 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
-const regUser = async (req ,res) => {
-    try {
-        
-    const { name ,email ,password ,bio ,avatar} = req.body;
+const regUser = async (req, res) => {
+  try {
+
+    const { name, email, password, bio } = req.body;
 
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email }
     });
 
-    if (existingUser){
-        return res.status(401).json({message : "You are already registered"});
+    if (existingUser) {
+      return res.status(401).json({
+        message: "You are already registered"
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password , 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
-        data : {
-            name,
-            email,
-            password : hashedPassword,
-            bio,
-            avatar
+    let avatarUrl = null;
+
+    if (req.file) {
+
+      const result = await cloudinary.uploader.upload_stream(
+        { folder: "avatars" },
+        async (error, result) => {
+
+          if (error) {
+            console.log(error);
+            return res.status(500).json({
+              message: "Image upload failed"
+            });
+          }
+
+          avatarUrl = result.secure_url;
+
+          const newUser = await prisma.user.create({
+            data: {
+              name,
+              email,
+              password: hashedPassword,
+              bio,
+              avatar: avatarUrl
+            }
+          });
+
+          return res.json({
+            message: "User registered successfully",
+            user: newUser
+          });
+
         }
-    })
+      );
 
-     return res.json({message : "User registered successfully" , user : newUser});
-    } catch (error) {
-        console.log(error); 
-      return  res.status(500).json({message : "Internal server error"});
+      result.end(req.file.buffer);
+
+    } else {
+
+      const newUser = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          bio
+        }
+      });
+
+      return res.json({
+        message: "User registered successfully",
+        user: newUser
+      });
+
     }
-}
+
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+};
 
 const loginUser = (req, res, next) => {
   try {
@@ -84,6 +133,27 @@ const loginUser = (req, res, next) => {
     });
   }
 };
+
+const userProfile = async (req , res) => {
+    try {
+        const userID = req.user.id;
+
+        const user = await prisma.user.findUnique({
+            where : {
+                id : Number(userID)
+            }
+        })
+
+        if(!user){
+            return res.status(401).json({message : "User not found"});
+        }else{
+            return res.status(200).json({message : "User found" , user : user});
+        }
+      }catch(error){
+        console.log(error);
+        return res.status(500).json({message : "Internal server error"});
+      }
+}
 
 const editUser  = async(req , res) => {
       try {
@@ -177,5 +247,6 @@ module.exports = {
     regUser,
     loginUser,
     editUser,
-    deleteUser
+    deleteUser,
+    userProfile
 }

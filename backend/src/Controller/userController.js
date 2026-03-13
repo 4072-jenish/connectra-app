@@ -33,7 +33,37 @@ const singleUser = async(req , res) => {
      }
 }
  
+const searchUser = async (req , res) => {
+     try {
+          const {search} = req.query;
+
+          const users = await prisma.user.findMany({
+               where: {
+                    OR: [
+                         {          
+                              name: {
+                                   contains: search
+                              }
+                         },
+                         {
+                              email: {
+                                   contains: search
+                              }
+                         }
+                    ]
+               }
+          })
+
+          if (!users) {
+          
+          }
+          } catch (error){
+
+          }
+}
+
 module.exports = {
     getAllUser,
-    singleUser
+    singleUser,
+    searchUser
 }

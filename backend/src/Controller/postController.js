@@ -105,7 +105,6 @@ const editPost = async (req, res) => {
 
     if (req.file) {
 
-      // delete old image
       if (post.publicId) {
         await cloudinary.uploader.destroy(post.publicId);
       }

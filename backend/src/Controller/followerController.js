@@ -39,11 +39,11 @@ const allFollowers = async (req, res) => {
   }
 };
 
-const followUser = async (req, res) => {
+const toggleFollow = async (req, res) => {
   try {
 
-    const followerId = req.user.id; 
-    const followingId = Number(req.params.id); 
+    const followerId = req.user.id;
+    const followingId = Number(req.params.id);
 
     if (followerId === followingId) {
       return res.status(400).json({
@@ -60,12 +60,26 @@ const followUser = async (req, res) => {
       }
     });
 
+    // If already following → unfollow
     if (existingFollow) {
-      return res.json({
-        message: "Already following"
+
+      await prisma.follow.delete({
+        where: {
+          followerId_followingId: {
+            followerId,
+            followingId
+          }
+        }
       });
+
+      return res.json({
+        followed: false,
+        message: "Unfollowed successfully"
+      });
+
     }
 
+    // If not following → follow
     const follow = await prisma.follow.create({
       data: {
         followerId,
@@ -73,49 +87,24 @@ const followUser = async (req, res) => {
       }
     });
 
-   return res.json({
+    return res.json({
+      followed: true,
       message: "Followed successfully",
       follow
     });
 
   } catch (error) {
     console.log(error);
-   return res.status(500).json({
+
+    return res.status(500).json({
       message: "Server error"
     });
   }
 };
 
-const  unfollowUser = async (req, res) => {
-
-  try {
-      const followerId = req.user.id
-      const followingId = Number(req.params.id)
-    
-        const unfollowed = await prisma.follow.deleteMany({
-              where: {
-                followerId,
-                followingId
-              }
-            })
-            if (!unfollowed) {
-              return  res.status(404).json({ message: "User not found" });
-            }
-    
-     return res.json({
-        message: "Unfollowed successfully"
-      })
-  } catch (error) {
-    console.log(error);
-    
-   return res.status(500).json({ message: "Server error" });
-  }
-}
-
 
 
 module.exports= {
     allFollowers,
-    followUser,
-    unfollowUser
+    toggleFollow
 }

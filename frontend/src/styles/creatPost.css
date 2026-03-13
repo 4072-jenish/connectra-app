@@ -1,0 +1,162 @@
+.create-post-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fff0e0 0%, #ffe4cc 100%);
+  padding: 2rem;
+}
+
+.create-post-card {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  border-radius: 30px;
+  box-shadow: 0 25px 50px -12px rgba(230, 92, 0, 0.25);
+  padding: 2rem;
+  animation: slideUp 0.5s ease-out;
+}
+
+.create-post-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.create-post-header h2 {
+  font-size: 2rem;
+  background: linear-gradient(45deg, #e65c00, #ff8c42);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.create-post-header p {
+  color: #ff9f43;
+}
+
+.post-textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 1rem;
+  border: 2px solid #ffe0b5;
+  border-radius: 15px;
+  font-size: 1rem;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.post-textarea:focus {
+  outline: none;
+  border-color: #ff8c42;
+  box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.1);
+}
+
+.content-input {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.char-count {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.8rem;
+  color: #ff9f43;
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+}
+
+.image-preview {
+  position: relative;
+  margin: 1rem 0;
+  border-radius: 15px;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+.image-preview img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+}
+
+.remove-image {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 107, 107, 0.9);
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.remove-image:hover {
+  background: #ff6b6b;
+  transform: scale(1.1);
+}
+
+.post-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.upload-section {
+  flex: 1;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #fff0e0;
+  border: 2px dashed #ff8c42;
+  border-radius: 15px;
+  color: #ff8c42;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+  background: #ffe0b5;
+  transform: translateY(-2px);
+}
+
+.submit-post {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: linear-gradient(45deg, #ff8c42, #ff6b6b);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-post:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+}
+
+.submit-post:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
