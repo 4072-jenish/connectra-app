@@ -7,6 +7,6 @@ const userRouter = express.Router();
 
 userRouter.get('/allUser', authMiddleware ,getAllUser);
 userRouter.get('/singleUser/:id', authMiddleware ,singleUser);
-userRouter.get('/searchUser', authMiddleware ,searchUser);
+userRouter.get('/search', authMiddleware ,searchUser);
 
 module.exports = userRouter;

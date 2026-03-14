@@ -33,34 +33,38 @@ const singleUser = async(req , res) => {
      }
 }
  
-const searchUser = async (req , res) => {
-     try {
-          const {search} = req.query;
+const searchUser = async (req, res) => {
+  console.log("Search API called");
 
-          const users = await prisma.user.findMany({
-               where: {
-                    OR: [
-                         {          
-                              name: {
-                                   contains: search
-                              }
-                         },
-                         {
-                              email: {
-                                   contains: search
-                              }
-                         }
-                    ]
-               }
-          })
+  try {
+    const { search } = req.query;
 
-          if (!users) {
-          
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          {
+            email: {
+              contains: search,
+              mode: "insensitive"
+            }
           }
-          } catch (error){
+        ]
+      }
+    });
 
-          }
-}
+    res.json({ users });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Search failed" });
+  }
+};
 
 module.exports = {
     getAllUser,

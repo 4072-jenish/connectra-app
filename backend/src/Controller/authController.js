@@ -3,6 +3,7 @@ const prisma = require('../../prisma');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('cloudinary');
 
 const regUser = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const regUser = async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(401).json({
+      return res.status(400).json({
         message: "You are already registered"
       });
     }
@@ -25,66 +26,39 @@ const regUser = async (req, res) => {
 
     if (req.file) {
 
-      const result = await cloudinary.uploader.upload_stream(
-        { folder: "avatars" },
-        async (error, result) => {
+      const base64Image =
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-          if (error) {
-            console.log(error);
-            return res.status(500).json({
-              message: "Image upload failed"
-            });
-          }
-
-          avatarUrl = result.secure_url;
-
-          const newUser = await prisma.user.create({
-            data: {
-              name,
-              email,
-              password: hashedPassword,
-              bio,
-              avatar: avatarUrl
-            }
-          });
-
-          return res.json({
-            message: "User registered successfully",
-            user: newUser
-          });
-
-        }
-      );
-
-      result.end(req.file.buffer);
-
-    } else {
-
-      const newUser = await prisma.user.create({
-        data: {
-          name,
-          email,
-          password: hashedPassword,
-          bio
-        }
+      const uploadResult = await cloudinary.uploader.upload(base64Image, {
+        folder: "avatars"
       });
 
-      return res.json({
-        message: "User registered successfully",
-        user: newUser
-      });
-
+      avatarUrl = uploadResult.secure_url;
     }
+
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        bio,
+        avatar: avatarUrl
+      }
+    });
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: newUser
+    });
 
   } catch (error) {
     console.log(error);
 
-    return res.status(500).json({
+    res.status(500).json({
       message: "Internal server error"
     });
   }
 };
-
 const loginUser = (req, res, next) => {
   try {
     passport.authenticate("local", (err, user, info) => {

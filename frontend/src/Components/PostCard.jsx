@@ -4,32 +4,32 @@ import { Icons, PostIcons } from "../utils/icons";
 import "../styles/postcard.css";
 import "../styles/globle.css"
 
-
 function PostCard({ post, index }) {
   const [likes, setLikes] = useState(post.likes?.length || 0);
-  const [isLiked, setIsLiked] = useState(false);
+  const userId = Number(localStorage.getItem("userId"));
+  const [isLiked, setIsLiked] = useState(
+       post.likes?.some((like) => like.userId === userId)
+  );
   const [isSaved, setIsSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
   const handleLike = async () => {
-    if (isLiking) return;
-    
-    setIsLiking(true);
-    try {
-      await API.get(`/like/toggleLike/${post.id}`);
-      if (!isLiked) {
-        setLikes(likes + 1);
-        setIsLiked(true);
-      } else {
-        setLikes(likes - 1);
-        setIsLiked(false);
-      }
-    } catch (error) {
-      console.error("Error liking post:", error);
-    } finally {
-      setIsLiking(false);
-    }
+         if (isLiking) return;
+       
+         setIsLiking(true);
+       
+         try {
+           await API.get(`/like/toggleLike/${post.id}`);
+       
+           setIsLiked((prev) => !prev);
+           setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
+       
+         } catch (error) {
+           console.error("Error liking post:", error);
+         } finally {
+           setIsLiking(false);
+         }
   };
 
   return (

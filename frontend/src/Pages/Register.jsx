@@ -47,11 +47,9 @@ function Register() {
     formData.append("email", form.email);
     formData.append("password", form.password);
     formData.append("bio", form.bio);
-
-    if (avatar) {
-      formData.append("avatar", avatar);
-    }
-
+    formData.append("avatar", avatar);
+    console.log(formData);
+    
     try {
       const { data } = await API.post("/auth/regUser", formData);
       alert(data.message);
@@ -240,7 +238,7 @@ function Register() {
                 <button 
                   type="submit" 
                   className="auth-button register-button"
-                  disabled={loading}
+                  disabled={loading || !avatar}
                 >
                   {loading ? (
                     <Icons.Refresh className="spinning" />

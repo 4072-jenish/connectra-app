@@ -8,4 +8,4 @@ followRouter.get('/allFollowers' , authMiddleware ,allFollowers);
 followRouter.get('/followUser/:id' , authMiddleware ,toggleFollow);
 
 
-module.exports = followRouter;
+module.exports = followRouter;  

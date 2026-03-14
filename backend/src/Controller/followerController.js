@@ -18,7 +18,7 @@ const allFollowers = async (req, res) => {
             avatar: true
           }
         }
-      }
+      } 
     });
 
     if (followers.length === 0) {
@@ -40,11 +40,13 @@ const allFollowers = async (req, res) => {
 };
 
 const toggleFollow = async (req, res) => {
+  
   try {
-
+    
     const followerId = req.user.id;
     const followingId = Number(req.params.id);
-
+    console.log("toggle follow called", followingId);
+    
     if (followerId === followingId) {
       return res.status(400).json({
         message: "You cannot follow yourself"

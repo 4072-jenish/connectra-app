@@ -1,21 +1,35 @@
 const prisma = require("../../prisma")
 const cloudinary = require("../Middleware/cloudinary");
 
-const allPosts = async(req , res) => {
-    try {
-        const allPosts = await prisma.post.findMany();
+const allPosts = async (req, res) => {
+  try {
 
-    if(!allPosts){
-        return res.status(404).json({ message: "No posts found" });
-    }else{
-        return res.status(200).json(allPosts);
-    }
-    
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
+    const posts = await prisma.post.findMany({
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true
+          }
+        },
+        likes: true,
+        comments: true
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    return res.status(200).json(posts);
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+};
 
 const addPost = async (req, res) => {
   try {

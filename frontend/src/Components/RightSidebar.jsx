@@ -7,25 +7,36 @@ import "../styles/globle.css";
 function RightSidebar() {
   const [followers, setFollowers] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [user , setUser] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [followersRes, suggestionsRes] = await Promise.all([
+        const [followersRes, profileRes] = await Promise.all([
           API.get("/follow/allFollowers"),
+          API.get("/auth/userProfile"),
         ]);
         
         setFollowers(followersRes.data.followers?.slice(0, 5) || []);
+        setUser(profileRes.data.user);
       } catch (error) {
         console.error("Error fetching sidebar data:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
+
+  const logout = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+  
+    window.location.href="/";
+  
+  };
 
   const handleFollow = async (userId) => {
     try {
@@ -46,10 +57,14 @@ function RightSidebar() {
             <span>U</span>
           </div>
           <div className="profile-info">
-            <span className="profile-username">@username</span>
-            <span className="profile-name">User Name</span>
+           <span className="profile-username">
+             @{user?.username || user?.name}
+           </span>
+           <span className="profile-name">
+             {user?.name}
+           </span>
           </div>
-          <button className="switch-btn">Switch</button>
+          <button className="switch-btn" onClick={logout}>Switch</button>
         </div>
 
         {/* Suggestions Section */}

@@ -18,7 +18,9 @@ function Profile() {
           API.get("/auth/userProfile")
         ]);
         setPosts(postsRes.data);
-        setUser(userRes.data);
+        setUser(userRes.data.user);
+        console.log(userRes);
+        
       } catch (error) {
         console.log(error);
       } finally {
