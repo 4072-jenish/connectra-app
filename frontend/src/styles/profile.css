@@ -214,6 +214,54 @@
   color: #ff8c42;
 }
 
+/* Add to profile.css */
+.profile-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.edit-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  background: linear-gradient(45deg, #ff8c42, #ff6b6b);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.edit-profile-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+  border-color: white;
+}
+
+.edit-profile-btn svg {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .profile-name-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .edit-profile-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @keyframes gradientMove {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -223,4 +271,26 @@
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+.profile-actions{
+  display:flex;
+  gap:10px;
+}
+
+.delete-account-btn{
+  background:#ff3b3b;
+  border:none;
+  padding:8px 14px;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:0.2s;
+}
+
+.delete-account-btn:hover{
+  background:#d92c2c;
 }

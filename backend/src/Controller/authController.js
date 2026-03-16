@@ -131,41 +131,43 @@ const userProfile = async (req , res) => {
 
 const editUser  = async(req , res) => {
       try {
-          const userID = req.user.id;
-    const { name ,email ,bio ,avatar } = req.body;
-
-    const user = await prisma.user.findUnique({
-       where: {
-        id : Number(userID)
-       }
-    })
-
-    if(!user){
-        return res.status(401).json({message : "User not found"});
-    }else{
-       const editedUser = await prisma.user.update({
-        where : {
+        console.log("from editProfile controller");
+        const userID = req.user.id;
+        console.log(req.body);
+        const { name ,email ,bio ,avatar } = req.body;
+    
+        const user = await prisma.user.findUnique({
+           where: {
             id : Number(userID)
-        },
-        data : {
-            name,
-            email,
-            bio,
-            avatar
+           }
+        })
+    
+        if(!user){
+            return res.status(401).json({message : "User not found"});
+        }else{
+           const editedUser = await prisma.user.update({
+            where : {
+                id : Number(userID)
+            },
+            data : {
+                name,
+                email,
+                bio,
+                avatar
+            }
+           });
+    
+           if(!editedUser){
+            return res.status(401).json({message : "User not found"});
+           }else{
+            return res.status(200).json({message : "User updated successfully" , user : editedUser});
+           }
         }
-       });
-
-       if(!editedUser){
-        return res.status(401).json({message : "User not found"});
-       }else{
-        return res.status(200).json({message : "User updated successfully" , user : editedUser});
-       }
-    }
-
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({message : "Internal server error"});
-      }
+    
+          } catch (error) {
+            console.log(error);
+            return res.status(500).json({message : "Internal server error"});
+          }
  }
 
  const deleteUser = async (req , res ) => {

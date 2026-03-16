@@ -36,17 +36,18 @@
 .profile-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  padding: 0.5rem;
   background: linear-gradient(145deg, #fff9f0, white);
   border-radius: 15px;
   animation: slideIn 0.5s ease;
 }
 
 .profile-avatar-large {
-  width: 100px !important;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
   background: linear-gradient(135deg, #ff8c42, #ff6b6b);
   display: flex;
   align-items: center;
@@ -58,7 +59,17 @@
   box-shadow: 0 5px 15px rgba(255, 140, 66, 0.3);
 }
 
+.profile-avatar-large img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .profile-info {
+  padding-right: 1.3rem !important;
+  padding-left: 1.3rem !important;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -166,7 +177,7 @@
   object-fit: cover;
 }
 
-.avatar-placeholder {
+.profile-avatar-placeholder {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #ff8c42, #ff6b6b);
@@ -289,4 +300,35 @@
 @keyframes loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+.left-sidebar {
+  transition: left 0.3s ease;
+}
+
+.sidebar-close {
+  display: none;
+  background: none;
+  border: none;
+  color: #ff8c42;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.sidebar-close:hover {
+  background: rgba(255, 140, 66, 0.1);
+  transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+  .sidebar-close {
+    display: block;
+  }
+  
+  .toggle-sidebar {
+    display: none;
+  }
 }

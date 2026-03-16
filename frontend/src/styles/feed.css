@@ -11,6 +11,7 @@
   padding: 2rem;
   display: flex;
   justify-content: center;
+  width: calc(100% - 400px);
 }
 
 .feed-center {

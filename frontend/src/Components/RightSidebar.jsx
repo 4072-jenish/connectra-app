@@ -2,13 +2,23 @@ import { useEffect, useState } from "react";
 import API from "../Services/axios";
 import "../styles/rightSidebar.css";
 import "../styles/globle.css";
+import { Icons } from "../utils/icons";
 
-
-function RightSidebar() {
+function RightSidebar({ isOpen, onClose }) {
   const [followers, setFollowers] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [user , setUser] = useState([]);
+  const [user , setUser] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,10 +26,11 @@ function RightSidebar() {
         const [followersRes, profileRes] = await Promise.all([
           API.get("/follow/allFollowers"),
           API.get("/auth/userProfile"),
-        ]);
+        ]); 
         
         setFollowers(followersRes.data.followers?.slice(0, 5) || []);
         setUser(profileRes.data.user);
+        
       } catch (error) {
         console.error("Error fetching sidebar data:", error);
       } finally {
@@ -30,18 +41,14 @@ function RightSidebar() {
   }, []);
 
   const logout = () => {
-
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
-  
     window.location.href="/";
-  
   };
 
   const handleFollow = async (userId) => {
     try {
       await API.get(`/follow/followUser/${userId}`);
-      // Update UI
       setSuggestions(prev => prev.filter(s => s.id !== userId));
     } catch (error) {
       console.error("Error following user:", error);
@@ -49,22 +56,37 @@ function RightSidebar() {
   };
 
   return (
-    <aside className="right-sidebar">
+    <aside className={`right-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-content">
+        {/* Close button for mobile */}
+        {isMobile && (
+          <button className="sidebar-close" onClick={onClose}>
+            <Icons.Close />
+          </button>
+        )}
+
         {/* User Profile Section */}
         <div className="profile-card">
           <div className="profile-avatar-large">
-            <span>U</span>
+            {user?.avatar ? (
+              <img src={user.avatar} alt="User"/>
+            ) : (
+              <div className="profile-avatar-placeholder">
+                <Icons.User />
+              </div>
+            )}
           </div>
           <div className="profile-info">
-           <span className="profile-username">
-             @{user?.username || user?.name}
-           </span>
-           <span className="profile-name">
-             {user?.name}
-           </span>
+            <span className="profile-username">
+              @{user?.username || user?.name}
+            </span>
+            <span className="profile-name">
+              {user?.name}
+            </span>
           </div>
-          <button className="switch-btn" onClick={logout}>Switch</button>
+          <button className="switch-btn" onClick={logout}>
+            <Icons.Refresh /> Switch
+          </button>
         </div>
 
         {/* Suggestions Section */}
@@ -101,7 +123,7 @@ function RightSidebar() {
                     className="follow-btn-small"
                     onClick={() => handleFollow(user.id)}
                   >
-                    Follow
+                    <Icons.Follow /> Follow
                   </button>
                 </div>
               ))}
@@ -145,7 +167,9 @@ function RightSidebar() {
           <a href="#">About</a> • <a href="#">Help</a> • <a href="#">Press</a> • 
           <a href="#">API</a> • <a href="#">Jobs</a> • <a href="#">Privacy</a> • 
           <a href="#">Terms</a>
-          <p className="copyright">© 2024 SOCIALWARM</p>
+          <p className="copyright">
+            <Icons.Instagram /> © 2024 CONNECTRA
+          </p>
         </div>
       </div>
     </aside>

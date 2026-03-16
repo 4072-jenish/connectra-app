@@ -51,13 +51,12 @@ function Login() {
         </div>
         
         <div className="auth-content">
-          {InstagramIcon && <InstagramIcon className="auth-logo" />}
+          {InstagramIcon && <InstagramIcon className="auth-logo save-btn" />}
           <h2 className="auth-title">Welcome Back!</h2>
           <p className="auth-subtitle">Login to continue your journey</p>
           
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="input-group">
-              {EmailIcon && <EmailIcon className="input-icon" />}
               <input
                 type="email"
                 name="email"
@@ -70,7 +69,6 @@ function Login() {
             </div>
 
             <div className="input-group">
-              {PasswordIcon && <PasswordIcon className="input-icon" />}
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -82,7 +80,7 @@ function Login() {
               />
               <button 
                 type="button"
-                className="password-toggle"
+                className="password-toggle  save-btn"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword 

@@ -89,7 +89,7 @@ function Register() {
         </div>
 
         <div className="auth-content">
-          <Icons.Instagram className="auth-logo" />
+          <Icons.Instagram className="auth-logo save-btn"/>
           <h2 className="auth-title">Create Account</h2>
           <p className="auth-subtitle">Join our warm community today!</p>
           
@@ -98,7 +98,6 @@ function Register() {
             {step === 1 && (
               <div className="step-content">
                 <div className="input-group">
-                  <AuthIcons.User className="input-icon" />
                   <input
                     type="text"
                     name="name"
@@ -111,7 +110,6 @@ function Register() {
                 </div>
 
                 <div className="input-group">
-                  <AuthIcons.Email className="input-icon" />
                   <input
                     type="email"
                     name="email"
@@ -124,7 +122,6 @@ function Register() {
                 </div>
 
                 <div className="input-group">
-                  <AuthIcons.Password className="input-icon" />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
@@ -136,7 +133,7 @@ function Register() {
                   />
                   <button 
                     type="button"
-                    className="password-toggle"
+                    className="password-toggle save-btn"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}

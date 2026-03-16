@@ -2,70 +2,79 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Icons, NavIcons } from "../utils/icons";
 import "../styles/Navbar.css";
-import "../styles/globle.css"
-
+import "../styles/globle.css";
 
 function Navbar() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
+    
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+
+  const navItems = [
+    { path: "/feed", icon: NavIcons.Home, label: "Feed" },
+    { path: "/create-post", icon: NavIcons.Create, label: "Create" },
+    { path: "/users", icon: Icons.Users, label: "Users" },
+    { path: "/followers", icon: Icons.UserFollow, label: "Followers" },
+    { path: "/profile", icon: NavIcons.Profile, label: "Profile" },
+  ];
 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
         <Link to="/feed" className="nav-logo">
           <Icons.Instagram className="logo-icon" />
-          <span className="logo-text">SocialWarm</span>
+          {!isMobile && <span className="logo-text">Connectra</span>}
         </Link>
 
-        <div className="nav-links">
-          <Link 
-            to="/feed" 
-            className={`nav-link ${location.pathname === '/feed' ? 'active' : ''}`}
-          >
-            <NavIcons.Home className="nav-icon" />
-            <span className="nav-label">Feed</span>
-          </Link>
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <div className="nav-links">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
+                >
+                  <Icon className="nav-icon" />
+                  <span className="nav-label">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
-          <Link 
-            to="/create-post" 
-            className={`nav-link ${location.pathname === '/create-post' ? 'active' : ''}`}
+        {/* Mobile Menu Button */}
+        {isMobile && (
+          <button 
+            className="mobile-nav-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            <NavIcons.Create className="nav-icon" />
-            <span className="nav-label">Create</span>
-          </Link>
-
-          <Link 
-            to="/users" 
-            className={`nav-link ${location.pathname === '/users' ? 'active' : ''}`}
-          >
-            <Icons.Users className="nav-icon" />
-            <span className="nav-label">Users</span>
-          </Link>
-
-          <Link 
-            to="/followers" 
-            className={`nav-link ${location.pathname === '/followers' ? 'active' : ''}`}
-          >
-            <Icons.UserFollow className="nav-icon" />
-            <span className="nav-label">Followers</span>
-          </Link>
-
-          <Link 
-            to="/profile" 
-            className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}
-          >
-            <NavIcons.Profile className="nav-icon" />
-            <span className="nav-label">Profile</span>
-          </Link>
-        </div>
+            <Icons.Menu />
+          </button>
+        )}
 
         <div className="nav-profile">
           <div className="profile-badge">
@@ -77,6 +86,26 @@ function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobile && mobileMenuOpen && (
+        <div className="mobile-nav-dropdown">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`mobile-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon className="nav-icon" />
+                <span className="nav-label">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </nav>
   );
 }

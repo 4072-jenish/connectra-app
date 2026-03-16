@@ -34,6 +34,9 @@ const toggleLike = async (req, res) => {
         }
       }
     });
+    console.log("LIKE API HIT");
+      console.log("USER:", userId);
+      console.log("POST:", postId);
 
     if (existingLike) {
 
@@ -46,6 +49,9 @@ const toggleLike = async (req, res) => {
           }
         }
       });
+      console.log("LIKE API HIT");
+      console.log("USER:", userId);
+      console.log("POST:", postId);
 
       return res.json({
         message: "Like removed"

@@ -73,7 +73,8 @@ const toggleFollow = async (req, res) => {
           }
         }
       });
-
+        console.log("unfollowed");
+        
       return res.json({
         followed: false,
         message: "Unfollowed successfully"
@@ -88,7 +89,8 @@ const toggleFollow = async (req, res) => {
         followingId
       }
     });
-
+       console.log("Followed");
+       
     return res.json({
       followed: true,
       message: "Followed successfully",

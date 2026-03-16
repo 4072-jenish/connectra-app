@@ -8,6 +8,7 @@ import Users from "./Pages/Users";
 import Profile from "./Pages/Profile";
 import Followers from "./Pages/Followers";
 import Search from "./Pages/Search"
+import EditProfile from "./Pages/EditProfile"
 
 import ProtectedRoute from "./Components/ProtectedRoute";
 
@@ -46,6 +47,12 @@ function App(){
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile/>
+          </ProtectedRoute>
+        }/>
+        
+        <Route path="/editProfile" element={
+          <ProtectedRoute>
+            <EditProfile/>
           </ProtectedRoute>
         }/>
 

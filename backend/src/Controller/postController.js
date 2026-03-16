@@ -220,30 +220,44 @@ const singlePost = async(req ,res ) => {
 }
 const deletePost = async (req, res) => {
   try {
+    const userId = req.user.id;
+    const postId = req.params.id;
 
-    const postId = Number(req.params.id);
-
-    const post = await prisma.post.findUnique({
-      where: { id: postId }
+    const post = await prisma.post.findFirst({
+      where: {
+        id: Number(postId),
+        authorId: Number(userId)
+      }
     });
 
     if (!post) {
-      return res.status(404).json({
-        message: "Post not found"
-      });
+      return res.status(403).json({ message: "You are not authorized to delete this post" });
     }
 
-    if (post.authorId !== req.user.id) {
-      return res.status(403).json({
-        message: "You are not authorized to delete this post"
-      });
-    }
+    // 🔹 Delete likes related to this post
+    await prisma.like.deleteMany({
+      where: {
+        postId: Number(postId)
+      }
+    });
 
+    // 🔹 Delete comments related to this post
+    await prisma.comment.deleteMany({
+      where: {
+        postId: Number(postId)
+      }
+    });
+
+    // 🔹 Delete image from Cloudinary if exists
     if (post.publicId) {
       await cloudinary.uploader.destroy(post.publicId);
     }
+
+    // 🔹 Delete the post
     await prisma.post.delete({
-      where: { id: postId }
+      where: {
+        id: Number(postId)
+      }
     });
 
     return res.status(200).json({
