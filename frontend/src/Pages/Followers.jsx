@@ -6,22 +6,17 @@ import "../styles/globle.css"
 
 
 function Followers() {
-  const [followers, setFollowers] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchFollowers = async () => {
-      try {
-        const { data } = await API.get("/follow/allFollowers");
-        setFollowers(data.followers);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFollowers();
-  }, []);
+  const fetchFollowers = async () => {
+    const { data } = await API.get("/follow/allFollowers");
+    return data.followers;
+  };
+
+  const { data: followers = [], isLoading } = useQuery({
+    queryKey: ["followers"],
+    queryFn: fetchFollowers,
+    staleTime: Infinity 
+  });
 
   return (
     <div className="followers-container">

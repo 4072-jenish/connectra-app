@@ -3,6 +3,7 @@ import API from "../Services/axios";
 import "../styles/rightSidebar.css";
 import "../styles/globle.css";
 import { Icons } from "../utils/icons";
+import { useNavigate } from "react-router-dom";
 
 function RightSidebar({ isOpen, onClose }) {
   const [followers, setFollowers] = useState([]);
@@ -10,6 +11,7 @@ function RightSidebar({ isOpen, onClose }) {
   const [user , setUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -140,7 +142,7 @@ function RightSidebar({ isOpen, onClose }) {
 
           <div className="followers-list">
             {followers.map((f) => (
-              <div key={f.follower.id} className="follower-item">
+              <div key={f.follower.id} className="follower-item" onClick={() => navigate(`/profile/${f.follower.id}`)}>
                 <div className="follower-avatar">
                   {f.follower.avatar ? (
                     <img src={f.follower.avatar} alt={f.follower.name} />

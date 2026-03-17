@@ -22,6 +22,10 @@ model User {
 
   followers Follow[] @relation("following")
   following Follow[] @relation("followers")
+
+  isVerified Boolean @default(false)
+  otp        String?
+  otpExpiry  DateTime?
 }
 
 model Post {

@@ -89,7 +89,7 @@
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  background-color: #ffe9d4;
   border: none;
   color: #ff8c42;
   font-size: 1rem;

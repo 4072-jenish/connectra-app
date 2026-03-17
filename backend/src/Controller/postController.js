@@ -230,30 +230,28 @@ const deletePost = async (req, res) => {
       }
     });
 
-    if (!post) {
-      return res.status(403).json({ message: "You are not authorized to delete this post" });
-    }
-
-    // 🔹 Delete likes related to this post
+      if (!post) {
+        return res.status(403).json({ message: "You are not authorized to delete this post" });
+      }
+      if (post.authorId !== req.user.id) {
+        return res.status(403).json({ message: "Not allowed" });
+      }
     await prisma.like.deleteMany({
       where: {
         postId: Number(postId)
       }
     });
 
-    // 🔹 Delete comments related to this post
     await prisma.comment.deleteMany({
       where: {
         postId: Number(postId)
       }
     });
 
-    // 🔹 Delete image from Cloudinary if exists
     if (post.publicId) {
       await cloudinary.uploader.destroy(post.publicId);
     }
 
-    // 🔹 Delete the post
     await prisma.post.delete({
       where: {
         id: Number(postId)

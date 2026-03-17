@@ -1,92 +1,93 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../Services/axios";
 import { Icons } from "../utils/icons";
 import "../styles/editProfile.css";
 import "../styles/globle.css";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function EditProfile() {
   const navigate = useNavigate();
-  const [user, setUser] = useState({
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState({
     name: "",
     email: "",
     bio: ""
   });
+  
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [fetchLoading, setFetchLoading] = useState(true);
 
+  const fetchProfile = async () => {
+    const { data } = await API.get("/auth/userProfile");
+    return data.user;
+  };
+
+  const { data: User, loading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: fetchProfile,
+    staleTime: Infinity,
+  });
   useEffect(() => {
-    const getProfile = async () => {
-      try {
-        setFetchLoading(true);
-        const { data } = await API.get("/auth/userProfile");
-        setUser(data.user);
-        if (data.user?.avatar) {
-          setAvatarPreview(data.user.avatar);
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setFetchLoading(false);
+    if (User) {
+      setForm({
+        name: User.name || "",
+        email: User.email || "",
+        bio: User.bio || ""
+      });
+  
+      if (User.avatar) {
+        setAvatarPreview(User.avatar);
       }
-    };
-
-    getProfile();
-  }, []);
+    }
+  }, [User]);
 
   const handleChange = (e) => {
-    setUser({
-      ...user,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+  
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setAvatar(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+  
+    setAvatar(file);
+  
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: fetchProfile,
+    staleTime: Infinity,
+  });
 
-    const formData = new FormData();
-    formData.append("name", user.name);
-    formData.append("email", user.email);
-    formData.append("bio", user.bio);
-    if (avatar) {
-      formData.append("avatar", avatar);
-    }
-
-    try {
-      await API.post("/auth/editUser", formData);
-      alert("Profile updated successfully!");
+  const updateProfile = useMutation({
+    mutationFn: async (formData) => {
+      return await API.post("/auth/editUser", formData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["profile"]);
       navigate("/profile");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to update profile");
-    } finally {
-      setLoading(false);
     }
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    updateProfile.mutate(formData);
   };
 
-  if (fetchLoading) {
-    return (
-      <div className="edit-loading">
-        <Icons.Refresh className="spinning" />
-        <p>Loading profile...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div className="edit-profile-page">
@@ -146,7 +147,7 @@ function EditProfile() {
                   type="text"
                   id="name"
                   name="name"
-                  value={user.name}
+                  value={form.name}
                   onChange={handleChange}
                   placeholder="Enter your full name"
                   required
@@ -161,7 +162,7 @@ function EditProfile() {
                   type="email"
                   id="email"
                   name="email"
-                  value={user.email}
+                  value={form.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
                   required
@@ -175,13 +176,13 @@ function EditProfile() {
                 <textarea
                   id="bio"
                   name="bio"
-                  value={user.bio}
+                  value={form.bio}
                   onChange={handleChange}
                   placeholder="Tell us about yourself"
                   rows="5"
                 />
                 <span className="char-count">
-                  {user.bio?.length || 0}/200
+                  {form.bio?.length || 0}/200
                 </span>
               </div>
             </div>
@@ -198,9 +199,9 @@ function EditProfile() {
               <button 
                 type="submit" 
                 className="save-btn"
-                disabled={loading}
+                disabled={updateProfile.isPending}
               >
-                {loading ? (
+                {updateProfile.isPending ? (
                   <>
                     <Icons.Refresh className="spinning" /> Updating...
                   </>

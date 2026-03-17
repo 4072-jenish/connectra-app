@@ -1,98 +1,92 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import API from "../Services/axios";
 import { Icons } from "../utils/icons";
 import "../styles/profile.css";
 import "../styles/globle.css";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function Profile() {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(null);
-  const [follower, setFollower] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { id } = useParams();
+  
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const [postsRes, userRes, followersRes] = await Promise.all([
+  const loggedInUserId = Number(localStorage.getItem("userId"));
+  const isOwnProfile = !id || Number(id) === loggedInUserId;
+
+  const fetchProfile = async () => {
+    if (id) {
+      const { data } = await API.get(`/auth/user/${id}`);
+  
+      return {
+        user: data,
+        posts: data.posts || [],
+        followers: (data.followers || []).map(f => f.follower || f),
+        following: (data.following || []).map(f => f.following || f),
+      };
+  
+    } else {
+      const [postsRes, userRes, followersRes, followingRes] =
+        await Promise.all([
           API.get("/post/userPost"),
           API.get("/auth/userProfile"),
-          API.get("/follow/allFollowers")
+          API.get("/follow/allFollowers"),
+          API.get("/follow/allFollowing"),
         ]);
-        setPosts(postsRes.data);
-        setUser(userRes.data.user);
-        setFollower(followersRes.data);
-        console.log(follower);
-        
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfileData();
-  }, []);
+  
+      return {
+        user: userRes.data.user,
+        posts: postsRes.data,
+        followers: (followersRes.data.followers || []).map(f => f.follower || f),
+        following: (followingRes.data.following || []).map(f => f.following || f),
+      };
+    }
+  };
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["profile", id],
+    queryFn: fetchProfile,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const handleEditProfile = () => {
     navigate("/editProfile");
   };
 
-const deletePost = async (postId) => {
+  const deletePost = useMutation({
+    mutationFn: (postId) => API.delete(`/post/deletePost/${postId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["profile"]);
+    }
+  });
 
-  const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+  const deleteAccount = useMutation({
+    mutationFn: () => API.delete("/auth/deleteUser"),
+    onSuccess: () => {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
+  });
 
-  if (!confirmDelete) return;
+  if (isLoading) return <p>Loading...</p>;
 
-  try {
-    await API.delete(`/post/deletePost/${postId}`);
-
-    setPosts(prev => prev.filter(post => post.id !== postId));
-
-    alert("Post deleted successfully");
-
-  } catch (error) {
-    console.error("Delete error:", error);
-  }
-};
-
-const handleDeleteAccount = async () => {
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete your account? This action cannot be undone."
-  );
-
-  if (!confirmDelete) return;
-
-  try {
-    await API.delete("/auth/deleteUser");
-
-    alert("Account deleted successfully");
-
-    // remove token if stored
-    localStorage.removeItem("token");
-
-    // redirect to login
-    navigate("/");
-
-  } catch (error) {
-    console.error("Delete account error:", error);
-    alert("Failed to delete account");
-  }
-};
-
-  if (loading) {
-    return (
-      <div className="profile-loading">
-        <Icons.Refresh className="spinning" />
-      </div>
-    );
-  }
+  const user = data?.user;
+  const posts = data?.posts || [];
+  const follower = (data?.followers || []).map(f => f.follower);
+  const following = (data?.following || []).map(f => f.following);
 
   return (
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-cover">
-          <div className="cover-gradient"></div>
+          <div className="cover-gradient">
+              <button className="back-btn" onClick={() => navigate("/feed")}>
+                <Icons.ArrowLeft /> Back
+              </button>
+          </div>
         </div>
         
         <div className="profile-info">
@@ -109,21 +103,23 @@ const handleDeleteAccount = async () => {
           <div className="profile-details">
             <div className="profile-name-wrapper">
   <h1 className="profile-name">{user?.name}</h1>
-          <div className="profile-actions">
-            <button
-              className="edit-profile-btn"
-              onClick={handleEditProfile}
-            >
-              <Icons.Edit /> Edit Profile
-            </button>
-        
-            <button
-              className="delete-account-btn save-btn"
-              onClick={handleDeleteAccount}
-            >
-              <Icons.Delete /> Delete Account
-            </button>
-          </div>
+            {isOwnProfile && (
+              <div className="profile-actions">
+                <button
+                  className="edit-profile-btn"
+                  onClick={handleEditProfile}
+                >
+                  <Icons.Edit /> Edit Profile
+                </button>
+            
+                <button
+                  className="delete-account-btn save-btn"
+                  onClick={ deleteAccount }
+                >
+                  <Icons.Delete /> Delete Account
+                </button>
+              </div>
+            )}
         </div>
             <p className="profile-bio">
               <Icons.Info /> {user?.bio || "No bio yet"}
@@ -137,12 +133,19 @@ const handleDeleteAccount = async () => {
               </div>
               <div className="stat-card">
                 <Icons.Users className="stat-icon" />
-                <span className="stat-number">{follower?.length || 0}</span>
+                <span className="stat-number clickable" onClick={() => setShowFollowers(true)}>
+                  {follower?.length || 0}
+                </span>
                 <span className="stat-label">Followers</span>
               </div>
               <div className="stat-card">
                 <Icons.UserCheck className="stat-icon" />
-                <span className="stat-number">0</span>
+                <span 
+                  className="stat-number clickable"
+                  onClick={() => setShowFollowing(true)}
+                >
+                  {following?.length || 0}
+                </span>
                 <span className="stat-label">Following</span>
               </div>
             </div>
@@ -168,12 +171,14 @@ const handleDeleteAccount = async () => {
                   className="profile-post-card"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <button
-                    className="delete-post-btn save-btn"
-                    onClick={() => deletePost(post.id)}
-                  >
-                    <Icons.Delete />
-                  </button>
+                  {isOwnProfile && (
+                    <button
+                      className="delete-post-btn save-btn"
+                      onClick={() => deletePost(post.id)}
+                    >
+                      <Icons.Delete />
+                    </button>
+                  )}
                   <p className="post-content">{post.content}</p>
                   {post.image && (
                     <div className="post-image">
@@ -194,7 +199,102 @@ const handleDeleteAccount = async () => {
             </div>
         )}
       </div>
+          {showFollowers && (
+         <div className="followers-modal">
+    <div className="followers-content">
+      <div className="modal-header">
+        <h3>
+          <Icons.Users /> Followers
+        </h3>
+        <button onClick={() => setShowFollowers(false)}>
+          <Icons.Close />
+        </button>
+      </div>
+      
+      <div className="followers-list">
+        {follower?.length === 0 ? (
+          <p>No followers yet</p>
+        ) : (
+          follower?.filter(u => u).map((u, index) => (
+            <div
+              key={u.id}
+              className="follower-item"
+              onClick={() => {
+                navigate(`/profile/${u.id}`);
+                setShowFollowers(false);
+              }}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="follower-avatar">
+                {u.avatar ? (
+                  <img src={u.avatar} alt={u.name} />
+                ) : (
+                  <div className="avatar-placeholder">
+                    {u.name.charAt(0)}
+                  </div>
+                )}
+              </div>
+
+              <div className="follower-info">
+                <span>@{u.username || u.name}</span>
+                <span>{u.name}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
+         </div>
+          )}
+          {showFollowing && (
+         <div className="followers-modal">
+    <div className="followers-content">
+      <div className="modal-header">
+        <h3>
+          <Icons.UserCheck /> Following
+        </h3>
+        <button onClick={() => setShowFollowing(false)}>
+          <Icons.Close />
+        </button>
+      </div>
+
+      <div className="followers-list">
+        {following?.length === 0 ? (
+          <p>Not following anyone yet</p>
+        ) : (
+          following?.filter(u => u).map((u, index) => (
+            <div
+              key={u.id}
+              className="follower-item"
+              onClick={() => {
+                navigate(`/profile/${u.id}`);
+                setShowFollowing(false);
+              }}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="follower-avatar">
+                {u.avatar ? (
+                  <img src={u.avatar} alt={u.name} />
+                ) : (
+                  <div className="avatar-placeholder">
+                    {u.name.charAt(0)}
+                  </div>
+                )}
+              </div>
+
+              <div className="follower-info">
+                <span>@{u.username || u.name}</span>
+                <span>{u.name}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+         </div>
+          )}
+      </div>
+    
   );
 }
 

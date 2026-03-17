@@ -52,8 +52,10 @@ function Register() {
     
     try {
       const { data } = await API.post("/auth/regUser", formData);
+      console.log(data.email);
+      
+      navigate("/verify-otp", { state: { email: data.email } });
       alert(data.message);
-      navigate("/");
     } catch (error) {
       console.log(error);
       alert(error.response?.data?.message || "Registration failed");

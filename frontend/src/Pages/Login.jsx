@@ -24,14 +24,12 @@ function Login() {
       localStorage.setItem("token", data.token);
       navigate("/feed");
     } catch (error) {
-      console.log(error);
       alert(error.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // Check if icons exist before rendering
   const InstagramIcon = Icons.Instagram;
   const EmailIcon = AuthIcons.Email;
   const PasswordIcon = AuthIcons.Password;

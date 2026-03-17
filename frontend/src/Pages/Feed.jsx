@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import API from "../Services/axios";
 import PostCard from "../Components/PostCard";
 import LeftSidebar from "../Components/LeftSidebar";
@@ -7,30 +6,26 @@ import { Icons } from "../utils/icons";
 import "../styles/feed.css";
 import "../styles/globle.css";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 function Feed() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchFeed = async () => {
-      try {
-        setLoading(true);
-        const { data } = await API.get("/feed/posts");
-        setPosts(data);
-      } catch (error) {
-        console.error("Error fetching feed:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // ✅ PURE FETCH FUNCTION (NO setState here)
+  const fetchFeed = async () => {
+    const { data } = await API.get("/feed/posts");
+    return data;
+  };
 
-    fetchFeed();
-  }, []);
+  // ✅ TANSTACK QUERY
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ["posts"],
+    queryFn: fetchFeed, // ✅ pass function reference
+    staleTime: 1000 * 60 * 2, // 🔥 2 min cache
+  });
 
-  // Close sidebars when clicking overlay
   const closeSidebars = () => {
     setLeftSidebarOpen(false);
     setRightSidebarOpen(false);
@@ -52,12 +47,10 @@ function Feed() {
         </button>
       </div>
 
-      {/* Sidebar Overlay */}
       {(leftSidebarOpen || rightSidebarOpen) && (
         <div className="sidebar-overlay active" onClick={closeSidebars}></div>
       )}
 
-      {/* Left Sidebar with props */}
       <LeftSidebar 
         isOpen={leftSidebarOpen} 
         onClose={() => setLeftSidebarOpen(false)} 
@@ -65,7 +58,9 @@ function Feed() {
 
       <main className="feed-main">
         <div className="feed-center">
-          {loading ? (
+
+          {/* ✅ USE TANSTACK LOADING */}
+          {isLoading ? (
             <div className="feed-loading">
               {[1, 2, 3].map((n) => (
                 <div key={n} className="post-skeleton">
@@ -82,10 +77,10 @@ function Feed() {
               ))}
             </div>
           )}
+
         </div>
       </main>
 
-      {/* Right Sidebar with props */}
       <RightSidebar 
         isOpen={rightSidebarOpen} 
         onClose={() => setRightSidebarOpen(false)} 

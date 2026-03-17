@@ -1,60 +1,67 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import API from "../Services/axios";
 import { useNavigate } from "react-router-dom";
 import { Icons } from "../utils/icons";
 import "../styles/creatPost.css";
-import "../styles/globle.css"
-
+import "../styles/globle.css";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function CreatePost() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef(null);
+
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef(null);
+
+  const createPost = useMutation({
+    mutationFn: async (formData) => {
+      return await API.post("/post/addPost", formData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["posts"]);
+      navigate("/feed");
+    }
+  });
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    setImage(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const removeImage = () => {
     setImage(null);
     setPreview(null);
-    fileInputRef.current.value = "";
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!content.trim()) {
       alert("Please write something!");
       return;
     }
 
-    setLoading(true);
     const formData = new FormData();
     formData.append("content", content);
+
     if (image) {
       formData.append("image", image);
     }
 
-    try {
-      await API.post("/post/addPost", formData);
-      navigate("/feed");
-    } catch (error) {
-      console.log(error);
-      alert("Failed to create post");
-    } finally {
-      setLoading(false);
-    }
+    createPost.mutate(formData);
   };
 
   return (
@@ -65,7 +72,6 @@ function CreatePost() {
           <h2>Share Your Moment</h2>
           <p>What's on your mind today?</p>
         </div>
-
         <form onSubmit={handleSubmit} className="create-post-form">
           <div className="content-input">
             <textarea
@@ -81,34 +87,31 @@ function CreatePost() {
           {preview && (
             <div className="image-preview">
               <img src={preview} alt="Preview" />
-              <button type="button" onClick={removeImage} className="remove-image">
+              <button type="button" onClick={removeImage}>
                 <Icons.Close />
               </button>
             </div>
           )}
 
           <div className="post-actions">
-            <div className="upload-section">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                ref={fileInputRef}
-                id="image-upload"
-                hidden
-              />
-              <label htmlFor="image-upload" className="upload-btn">
-                <Icons.Image className="btn-icon" />
-                Add Photo
-              </label>
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              ref={fileInputRef}
+              hidden
+              id="image-upload"
+            />
 
-            <button 
-              type="submit" 
-              className="submit-post"
-              disabled={loading || !content.trim()}
+            <label htmlFor="image-upload" className="upload-btn">
+              <Icons.Image /> Add Photo
+            </label>
+
+            <button
+              type="submit"
+              disabled={createPost.isPending || !content.trim()}
             >
-              {loading ? (
+              {createPost.isPending ? (
                 <Icons.Refresh className="spinning" />
               ) : (
                 <>
