@@ -236,7 +236,7 @@ function Register() {
               ) : (
                 <button 
                   type="submit" 
-                  className="auth-button register-button"
+                  className="save-btn register-button"
                   disabled={loading || !avatar}
                 >
                   {loading ? (

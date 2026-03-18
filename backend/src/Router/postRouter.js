@@ -7,7 +7,6 @@ const postRouter = express.Router();
 
 postRouter.get('/allPost' , authMiddleware ,allPosts);
 postRouter.get('/userPost' , authMiddleware ,userPost);
-postRouter.get('/singlePost/:id' , authMiddleware ,singlePost);
 postRouter.post('/addPost', authMiddleware, upload.single("image") , addPost);
 postRouter.put('/editPost/:id', authMiddleware, upload.single("image") , editPost);
 postRouter.delete('/deletePost/:id', authMiddleware, deletePost);

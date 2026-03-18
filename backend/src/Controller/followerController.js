@@ -1,78 +1,47 @@
 const prisma = require("../../prisma");
 
-const allFollowers = async (req, res) => {
+const getFollowData = async (req, res) => {
   try {
-
     const userId = req.user.id;
 
-    const followers = await prisma.follow.findMany({
-      where: {
-        followingId: userId
-      },
-      include: {
-        follower: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true
+    const [followers, following] = await Promise.all([
+      prisma.follow.findMany({
+        where: { followingId: userId },
+        include: {
+          follower: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true
+            }
           }
         }
-      } 
-    });
+      }),
 
-    if (followers.length === 0) {
-      return res.status(404).json({
-        message: "No followers found"
-      });
-    }
-
-   return res.status(200).json({
-      followers
-    });
-
-  } catch (error) {
-    console.log(error);
-   return res.status(500).json({
-      message: "Internal server error"
-    });
-  }
-};
-
-const allFollowing = async (req, res) => {
-  try {
-
-    const userId = req.user.id;
-
-    const following = await prisma.follow.findMany({
-      where: {
-        followerId: userId
-      },
-      include: {
-        following: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true
+      prisma.follow.findMany({
+        where: { followerId: userId },
+        include: {
+          following: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true
+            }
           }
         }
-      } 
-    });
+      })
+    ]);
 
-    if (following.length === 0) {
-      return res.status(404).json({
-        message: "No following found"
-      });
-    }
-
-   return res.status(200).json({
+    return res.status(200).json({
+      followers,
       following
     });
 
   } catch (error) {
     console.log(error);
-   return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error"
     });
   }
@@ -148,7 +117,6 @@ const toggleFollow = async (req, res) => {
 
 
 module.exports= {
-    allFollowers,
-    allFollowing,
+    getFollowData,
     toggleFollow
 }

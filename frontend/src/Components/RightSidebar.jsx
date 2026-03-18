@@ -25,20 +25,25 @@ function RightSidebar({ isOpen, onClose }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [followersRes, profileRes] = await Promise.all([
-          API.get("/follow/allFollowers"),
+        const [followRes, profileRes] = await Promise.all([
+          API.get("/follow/getFollowData"),
           API.get("/auth/userProfile"),
-        ]); 
-        
-        setFollowers(followersRes.data.followers?.slice(0, 5) || []);
+        ]);
+  
+        setFollowers(
+          (followRes.data.followers || [])
+            .map(f => f.follower)
+            .slice(0, 5)
+        );
         setUser(profileRes.data.user);
-        
+        console.log("FOLLOW DATA:", followRes.data);
       } catch (error) {
         console.error("Error fetching sidebar data:", error);
       } finally {
         setLoading(false);
-      }
+      } 
     };
+  
     fetchData();
   }, []);
 
@@ -87,7 +92,7 @@ function RightSidebar({ isOpen, onClose }) {
             </span>
           </div>
           <button className="switch-btn" onClick={logout}>
-            <Icons.Refresh /> Switch
+             Q
           </button>
         </div>
 
@@ -114,7 +119,7 @@ function RightSidebar({ isOpen, onClose }) {
                     ) : (
                       <div className="avatar-placeholder">
                         {user.name.charAt(0)}
-                      </div>
+                      </div>  
                     )}
                   </div>
                   <div className="suggestion-info">
@@ -141,28 +146,36 @@ function RightSidebar({ isOpen, onClose }) {
           </div>
 
           <div className="followers-list">
-            {followers.map((f) => (
-              <div key={f.follower.id} className="follower-item" onClick={() => navigate(`/profile/${f.follower.id}`)}>
-                <div className="follower-avatar">
-                  {f.follower.avatar ? (
-                    <img src={f.follower.avatar} alt={f.follower.name} />
-                  ) : (
-                    <div className="avatar-placeholder">
-                      {f.follower.name.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <div className="follower-info">
-                  <span className="follower-username">@{f.follower.username || f.follower.name}</span>
-                  <span className="follower-name">{f.follower.name}</span>
-                </div>
-                <div className="follower-status">
-                  <span className="status-dot"></span>
-                </div>
+          {followers.map((f) => (
+            <div
+              key={f.id}
+              className="follower-item"
+              onClick={() => navigate(`/profile/${f.id}`)}
+            >
+              <div className="follower-avatar">
+                {f.avatar ? (
+                  <img src={f.avatar} alt={f.name} />
+                ) : (
+                  <div className="avatar-placeholder">
+                    {f.name}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+        
+              <div className="follower-info">
+                <span className="follower-username">
+                  @{f.username || f.name}
+                </span>
+                <span className="follower-name">{f.name}</span>
+              </div>
+        
+              <div className="follower-status">
+                <span className="status-dot"></span>
+              </div>
+            </div>
+          ))}
         </div>
+        </div> 
 
         {/* Footer Links */}
         <div className="sidebar-footer-links">

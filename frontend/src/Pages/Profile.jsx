@@ -29,19 +29,18 @@ function Profile() {
       };
   
     } else {
-      const [postsRes, userRes, followersRes, followingRes] =
+      const [postsRes, userRes, followRes] =
         await Promise.all([
           API.get("/post/userPost"),
           API.get("/auth/userProfile"),
-          API.get("/follow/allFollowers"),
-          API.get("/follow/allFollowing"),
+          API.get("/follow/getFollowData"),
         ]);
   
       return {
         user: userRes.data.user,
         posts: postsRes.data,
-        followers: (followersRes.data.followers || []).map(f => f.follower || f),
-        following: (followingRes.data.following || []).map(f => f.following || f),
+        followers: followRes.data.followers || [],
+        following: followRes.data.following || [],
       };
     }
   };
@@ -293,7 +292,7 @@ function Profile() {
     </div>
          </div>
           )}
-      </div>
+    </div>
     
   );
 }

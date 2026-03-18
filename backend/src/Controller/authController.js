@@ -67,10 +67,11 @@
         `
       });
         console.log("otp sent");
+        console.log(otp);
         
       return res.status(201).json({
         message: "OTP sent to email",
-        email: newUser.email // important for next step
+        email: newUser.email 
       });
   
     } catch (error) {

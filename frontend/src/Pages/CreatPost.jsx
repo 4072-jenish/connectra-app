@@ -109,6 +109,7 @@ function CreatePost() {
 
             <button
               type="submit"
+              className="save-btn"
               disabled={createPost.isPending || !content.trim()}
             >
               {createPost.isPending ? (

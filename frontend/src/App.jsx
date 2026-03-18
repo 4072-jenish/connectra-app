@@ -12,6 +12,7 @@ import EditProfile from "./Pages/EditProfile"
 
 import ProtectedRoute from "./Components/ProtectedRoute";
 import VerifyOTP from "./Pages/VerifyOTP";
+import PublicRoute from "./Components/PublicRoute";
 
 function App(){
 
@@ -22,7 +23,11 @@ function App(){
       <Routes>
 
         {/* Public */}
-        <Route path="/" element={<Login/>}/>
+        <Route path="/" element={
+          <PublicRoute>
+          <Login/>
+          </PublicRoute>
+          }/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/verify-otp" element={<VerifyOTP/>} />
         {/* Private */}
