@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const prisma = require("../../prisma");
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async(req, res, next) => {
 
   try {
 
@@ -16,9 +17,20 @@ const authMiddleware = (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded;
+    console.log(decoded.email);
 
-    next();
+    const existUser = await prisma.user.findUnique({
+      where : {
+        email : decoded.email
+      }
+    })  
+    console.log(existUser);
+    
+    if (existUser) {
+      req.user = existUser;
+      next();
+    }
+
 
   } catch (error) {
 

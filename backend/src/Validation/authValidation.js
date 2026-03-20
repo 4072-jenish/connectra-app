@@ -1,0 +1,24 @@
+const { z } = require("zod");
+
+const registerSchema = z.object({
+  name: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(6),
+  bio: z.string().optional()
+});
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6)
+});
+
+const verifyOtpSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().length(6)
+});
+
+module.exports = {
+  registerSchema,
+  loginSchema,
+  verifyOtpSchema
+};

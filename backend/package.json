@@ -23,7 +23,8 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "prisma": "^6.19.2",
-    "sendgrid": "^5.2.3"
+    "sendgrid": "^5.2.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

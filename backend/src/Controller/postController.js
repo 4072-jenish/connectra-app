@@ -1,25 +1,9 @@
-const prisma = require("../../prisma")
-const cloudinary = require("../Middleware/cloudinary");
+const postService = require("../Services/postService");
 
 const allPosts = async (req, res) => {
   try {
 
-    const posts = await prisma.post.findMany({
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true
-          }
-        },
-        likes: true,
-        comments: true
-      },
-      orderBy: {
-        createdAt: "desc"
-      }
-    });
+    const posts = await postService.getAllPosts();
 
     return res.status(200).json(posts);
 
@@ -33,64 +17,22 @@ const allPosts = async (req, res) => {
 
 const addPost = async (req, res) => {
   try {
-
     const { content } = req.body;
-    let imageUrl = null;
-    let publicId = null;
 
-    if (req.file) {
+    const post = await postService.createPost(
+      req.user.id,
+      content,
+      req.file
+    );
 
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "posts" },
-        async (error, result) => {
-
-          if (error) {
-            console.log(error);
-            return res.status(500).json({ message: "Image upload failed" });
-          }
-
-          imageUrl = result.secure_url;
-          publicId = result.public_id;
-
-          const newPost = await prisma.post.create({
-            data: {
-              content,
-              image: imageUrl,
-              publicId: publicId,
-              authorId: req.user.id
-            }
-          });
-
-          return res.status(200).json({
-            message: "Post created successfully",
-            post: newPost
-          });
-        }
-      );
-
-      stream.end(req.file.buffer);
-
-    } else {
-
-      const newPost = await prisma.post.create({
-        data: {
-          content,
-          authorId: req.user.id
-        }
-      });
-
-      return res.status(200).json({
-        message: "Post created successfully",
-        post: newPost
-      });
-
-    }
+    return res.status(200).json({
+      message: "Post created successfully",
+      post
+    });
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: "Internal server error"
-    });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -99,75 +41,13 @@ const editPost = async (req, res) => {
 
     const { content } = req.body;
     const postId = Number(req.params.id);
-
-    const post = await prisma.post.findUnique({
-      where: { id: postId }
-    });
-
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    if (post.authorId !== req.user.id) {
-      return res.status(403).json({
-        message: "You are not authorized to edit this post"
-      });
-    }
-
-    let imageUrl = post.image;
-    let publicId = post.publicId;
-
-    if (req.file) {
-
-      if (post.publicId) {
-        await cloudinary.uploader.destroy(post.publicId);
-      }
-
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "posts" },
-        async (error, result) => {
-
-          if (error) {
-            console.log(error);
-            return res.status(500).json({ message: "Image upload failed" });
-          }
-
-          imageUrl = result.secure_url;
-          publicId = result.public_id;
-
-          const updatedPost = await prisma.post.update({
-            where: { id: postId },
-            data: {
-              content,
-              image: imageUrl,
-              publicId: publicId
-            }
-          });
-
-          return res.status(200).json({
-            message: "Post updated successfully",
-            post: updatedPost
-          });
-        }
-      );
-
-      stream.end(req.file.buffer);
-
-    } else {
-
-      const updatedPost = await prisma.post.update({
-        where: { id: postId },
-        data: { content }
-      });
-
-      return res.status(200).json({
-        message: "Post updated successfully",
-        post: updatedPost
-      });
-
-    }
-
-  } catch (error) {
+ 
+    const updatedPost = await postService.updatePost( postId, req.user.id, content, req.file)
+     return res.status(200).json({
+       message: "Post updated successfully",
+       post: updatedPost
+     });
+    } catch (error) {
     console.log(error);
     res.status(500).json({
       message: "Internal server error"
@@ -180,11 +60,7 @@ const userPost = async(req ,res ) => {
           const userID = req.user.id;
           console.log(userID);
           
-          const userPosts = await prisma.post.findMany({
-            where: {
-              authorId: Number(userID)
-            }
-          })
+          const userPosts = await postService.getPostsByUser(userID)
         
           if(!userPosts){
              console.log("You don't have any postes yet :");
@@ -197,76 +73,26 @@ const userPost = async(req ,res ) => {
         return res.status(500).json({ message: "Internal server error" });
       }
 }
-const singlePost = async(req ,res ) => {
-      try {
-          const postID = req.params.id;
-          
-          const singlepost = await prisma.post.findUnique({
-            where : {
-              id : Number(postID)
-            }
-          })
 
-          if (!singlepost) {
-             console.log("Cann't find single post :");
-             return res.status(404).json({ message: "No posts found" });
-          }
-
-          return res.status(200).json(singlepost);
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-}
 const deletePost = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const postId = req.params.id;
-
-    const post = await prisma.post.findFirst({
-      where: {
-        id: Number(postId),
-        authorId: Number(userId)
-      }
-    });
-
-      if (!post) {
-        return res.status(403).json({ message: "You are not authorized to delete this post" });
-      }
-      if (post.authorId !== req.user.id) {
-        return res.status(403).json({ message: "Not allowed" });
-      }
-    await prisma.like.deleteMany({
-      where: {
-        postId: Number(postId)
-      }
-    });
-
-    await prisma.comment.deleteMany({
-      where: {
-        postId: Number(postId)
-      }
-    });
-
-    if (post.publicId) {
-      await cloudinary.uploader.destroy(post.publicId);
-    }
-
-    await prisma.post.delete({
-      where: {
-        id: Number(postId)
-      }
-    });
+    await postService.deletePostWithRelations(
+      req.params.id,
+      req.user.id
+    );
 
     return res.status(200).json({
       message: "Post deleted successfully"
     });
 
   } catch (error) {
+
+    if (error.message === "UNAUTHORIZED") {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
     console.log(error);
-    return res.status(500).json({
-      message: "Internal server error"
-    });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -275,7 +101,6 @@ module.exports = {
     allPosts,
     addPost,
     userPost,
-    singlePost,
     editPost,
     deletePost
 }

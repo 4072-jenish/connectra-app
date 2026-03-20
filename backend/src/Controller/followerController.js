@@ -1,38 +1,11 @@
-const prisma = require("../../prisma");
+
+const followService = require("../Services/followService");
 
 const getFollowData = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const [followers, following] = await Promise.all([
-      prisma.follow.findMany({
-        where: { followingId: userId },
-        include: {
-          follower: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              avatar: true
-            }
-          }
-        }
-      }),
-
-      prisma.follow.findMany({
-        where: { followerId: userId },
-        include: {
-          following: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              avatar: true
-            }
-          }
-        }
-      })
-    ]);
+    const { followers, following } = await followService.getFollowData(userId);
 
     return res.status(200).json({
       followers,
@@ -61,26 +34,11 @@ const toggleFollow = async (req, res) => {
       });
     }
 
-    const existingFollow = await prisma.follow.findUnique({
-      where: {
-        followerId_followingId: {
-          followerId,
-          followingId
-        }
-      }
-    });
+    const existingFollow = await followService.findFollow(followerId, followingId);
 
-    // If already following → unfollow
     if (existingFollow) {
 
-      await prisma.follow.delete({
-        where: {
-          followerId_followingId: {
-            followerId,
-            followingId
-          }
-        }
-      });
+      await followService.deleteFollow(followerId, followingId);
         console.log("unfollowed");
         
       return res.json({
@@ -90,13 +48,7 @@ const toggleFollow = async (req, res) => {
 
     }
 
-    // If not following → follow
-    const follow = await prisma.follow.create({
-      data: {
-        followerId,
-        followingId
-      }
-    });
+    const follow = await followService.addFollow(followerId, followingId);
        console.log("Followed");
        
     return res.json({

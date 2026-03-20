@@ -3,8 +3,8 @@
   const passport = require('passport');
   const jwt = require('jsonwebtoken');
   const cloudinary = require('cloudinary');
-  const crypto = require("crypto");
   const sgMail = require("@sendgrid/mail");
+  const userService = require('../Services/authService')
 
 
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -15,9 +15,7 @@
   try {
       const { name, email, password, bio } = req.body;
   
-      const existingUser = await prisma.user.findUnique({
-        where: { email }
-      });
+      const existingUser = await userService.getUserByEmail(email);
   
       if (existingUser) {
         return res.status(400).json({
@@ -43,8 +41,7 @@
         avatarUrl = uploadResult.secure_url;
       }
   
-      const newUser = await prisma.user.create({
-        data: {
+     const newUser = await userService.createUser({
           name,
           email,
           password: hashedPassword,
@@ -53,8 +50,8 @@
           isVerified: false,
           otp,
           otpExpiry
-        }
-      });
+     })
+     
   
       await sgMail.send({
         to: email,
@@ -137,12 +134,8 @@
       try {
           const userID = req.user.id;
 
-          const user = await prisma.user.findUnique({
-              where : {
-                  id : Number(userID)
-              }
-          })
-
+          const user = await userService.getUserById(userID);
+          
           if(!user){
               return res.status(401).json({message : "User not found"});
           }else{
@@ -158,43 +151,7 @@
     try {
       const { id } = req.params;
   
-      const user = await prisma.user.findUnique({
-        where: {
-          id: Number(id)
-        },
-        include: {
-          posts: {
-            include: {
-              likes: true,
-              comments: true
-            }
-          },
-          followers: {
-            include: {
-              follower: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  avatar: true
-                }
-              }
-            }
-          },
-          following: {
-            include: {
-              following: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  avatar: true
-                }
-              }
-            }
-          }
-        }
-      });
+      const user = await userService.getFullUserProfile(id);
   
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -215,25 +172,11 @@
           console.log(req.body);
           const { name ,email ,bio ,avatar } = req.body;
       
-          const user = await prisma.user.findUnique({
-            where: {
-              id : Number(userID)
-            }
-          })
+          const user = await userService.getUserById(userID)
           if(!user){
               return res.status(401).json({message : "User not found"});
           }else{
-            const editedUser = await prisma.user.update({
-              where : {
-                  id : Number(userID)
-              },
-              data : {
-                  name,
-                  email,
-                  bio,
-                  avatar
-              }
-            });
+            const editedUser = await userService.editedUser({userID }, {name , email , bio , avatar});
             if(!editedUser){
               return res.status(401).json({message : "User not found"});
             }else{
@@ -252,42 +195,12 @@
       
       const userID = req.user.id;
 
-      const user = await prisma.user.findUnique({
-        where : {
-          id : Number(userID)
-        }
-      })
-      if (user) {
-        await prisma.follow.deleteMany({
-                where: {
-                  OR: [
-                    { followerId: userID },
-                    { followingId: userID }
-                  ]
-                }
-              });
-          
-              await prisma.like.deleteMany({
-                where: { userId : userID }
-              });
-          
-              await prisma.comment.deleteMany({
-                where: { userId :userID }
-              });
-          
-              await prisma.post.deleteMany({
-                where: { authorId: userID }
-              });
-          
-              const deletedUser = await prisma.user.delete({
-                where: { id: userID }
-              });
+      const user = await userService.deleteUserWithRelation(userID);
 
-          return res.status(200).json({message : "User deleted successfully" , user : deletedUser});
-      } else {
-        return res.status(401).json({message : "User not found"});
-      }
-
+      return res.status(200).json({
+      message: "User deleted successfully",
+      user: user
+    });
     } catch (error) {
       console.log(error);
       
@@ -299,9 +212,7 @@
       try {
         const { email, otp } = req.body;
     
-        const user = await prisma.user.findUnique({
-          where: { email }
-        });
+        const user = await userService.getUserByEmail(email);
     
         if (!user) {
           return res.status(404).json({ message: "User not found" });
@@ -315,17 +226,9 @@
           return res.status(400).json({ message: "OTP expired" });
         }
     
-        await prisma.user.update({
-          where: { email },
-          data: {
-            isVerified: true,
-            otp: null,
-            otpExpiry: null
-          }
-        });
-    
+        await userService.editedUser(email , { isVerified: true, otp: null, otpExpiry: null });
+
         return res.json({ message: "Verification successful" });
-    
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });

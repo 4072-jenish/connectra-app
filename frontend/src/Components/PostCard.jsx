@@ -48,7 +48,6 @@ function PostCard({ post, index }) {
     const fetchLikes = async () => {
           try {
             const res = await API.get(`/like/allLike-post/${post.id}`);
-              console.log(res);
               
             const allLikes = res.data.allLike || [];
     
@@ -86,6 +85,8 @@ function PostCard({ post, index }) {
           const res = await API.post(`/comment/addComment/${post.id}`, {
             comment: commentText
           });
+          console.log(post.id);
+          
       
           setComments((prev) => [...prev, res.data]);
           setCommentText("");

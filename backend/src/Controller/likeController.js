@@ -1,13 +1,10 @@
-const prisma = require("../../prisma");
+
+const likeService = require("../Services/likeService")
 
 const allLikewithPost = async(req , res ) => {
      try {
             const  postId  = req.params.id;
-            const allLike = await prisma.like.findMany({
-                where : {
-                    postId : Number(postId)
-                }
-            });
+            const allLike = await likeService.getAllLikes(postId);
          
             if (!allLike) {
                  console.log("There was no likes on your post sir :");
@@ -26,14 +23,7 @@ const toggleLike = async (req, res) => {
     const userId = req.user.id;
     const postId = Number(req.params.id);
 
-    const existingLike = await prisma.like.findUnique({
-      where: {
-        userId_postId: {
-          userId,
-          postId
-        }
-      }
-    });
+    const existingLike = await likeService.findLike(userId, postId);
     console.log("LIKE API HIT");
       console.log("USER:", userId);
       console.log("POST:", postId);
@@ -41,14 +31,7 @@ const toggleLike = async (req, res) => {
     if (existingLike) {
 
       // remove like
-      await prisma.like.delete({
-        where: {
-          userId_postId: {
-            userId,
-            postId
-          }
-        }
-      });
+      await likeService.deleteLike(userId,postId)
       console.log("LIKE API HIT");
       console.log("USER:", userId);
       console.log("POST:", postId);
@@ -60,12 +43,7 @@ const toggleLike = async (req, res) => {
     } else {
 
       // add like
-      await prisma.like.create({
-        data: {
-          userId,
-          postId
-        }
-      });
+      await likeService.addLike(userId , postId);
 
       return res.json({
         message: "Post liked"

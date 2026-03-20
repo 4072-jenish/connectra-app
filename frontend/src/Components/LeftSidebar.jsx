@@ -38,10 +38,6 @@ function LeftSidebar({ isOpen, onClose }) {
   const navItems = [
     { path: "/feed", icon: NavIcons.Home, label: "Home" },
     { path: "/search", icon: NavIcons.Search, label: "Search" },
-    { path: "#", icon: Icons.Explore, label: "Explore" },
-    { path: "#", icon: NavIcons.Reels, label: "Reels" },
-    { path: "#", icon: NavIcons.Messages, label: "Messages" },
-    { path: "#", icon: NavIcons.Notifications, label: "Notifications" },
     { path: "/create-post", icon: NavIcons.Create, label: "Create" },
     { path: "/profile", icon: NavIcons.Profile, label: "Profile" },
   ];

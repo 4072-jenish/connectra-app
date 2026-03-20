@@ -1,57 +1,31 @@
-const prisma = require("../../prisma");
+const followService = require("../Services/followService");
+const postService = require("../Services/postService");
 
-const feedContent = async (req , res) => {
-    try {
-         const userId = req.user.id;
+const feedContent = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-    const following = await prisma.follow.findMany({
-      where: {
-        followerId: userId
-      },
-      select: {
-        followingId: true
-      }
-    });
+    const { following } = await followService.getFollowData(userId);
 
     const followingIds = following.map(f => f.followingId);
-    console.log(followingIds);
-    
 
-    const posts = await prisma.post.findMany({
-      where: {
-        authorId: {
-          in: followingIds
-        }
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true
-          }
-        },
-        likes: true,
-        comments: true
-      },
-      orderBy: {
-        createdAt: "desc"
-      }
-    });
-     console.log(posts);
-     
-     if (!posts) {
-        console.log('There was no posted from your followers');
-        return res.status(404).json({message: "There was no posted from your followers"});
-     }
+    const posts = await postService.getPostsByUser(followingIds);
+
+    if (!posts.length) {
+      return res.status(404).json({
+        message: "No posts from followers"
+      });
+    }
 
     return res.json(posts);
-    }catch(error){
-            console.log(error);
-            return res.status(500).json({message: "Internal server error"});
-            
-    }
-}
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error"
+    });
+  }
+};
 
 
 

@@ -1,26 +1,12 @@
+const { text } = require("express");
 const prisma = require("../../prisma");
+const commentService = require("../Services/commentService");
 
 const allCommentPost = async(req , res) => {
       try {
             const postId = req.params.id;
        
-            const comments = await prisma.comment.findMany({
-               where: {
-                   postId: Number(postId)
-               },
-               include: {
-                  user: {
-                    select: {
-                      id: true,
-                      name: true,
-                      avatar: true
-                    }
-                  }
-               },
-                orderBy: {
-                  createdAt: "desc"
-               }
-            })
+            const comments = await commentService.allCommentOfPost(postId);
        
             if (!comments) {
                 console.log("There was no comments on post sir :");
@@ -40,14 +26,10 @@ const addComment = async(req  , res) => {
         const userId = req.user.id;
         const postId = req.params.id;
         const {comment} = req.body;
-
-        const newComment = await prisma.comment.create({
-            data : {
-                userId : Number(userId),
-                postId : Number(postId),
-                text : comment
-            }
-        })
+ 
+        console.log(userId , postId, comment);
+        
+        const newComment = await commentService.addComment(userId , postId , comment);
 
         if (!newComment) {
             console.log("Ther was an error to add comment sir :");
@@ -69,12 +51,7 @@ const editComment = async(req , res) => {
         
         console.log(userId);
         
-        const existComment = await prisma.comment.findFirst({
-            where: {
-                id: Number(commentId),
-                userId: Number(userId)
-            }
-        })
+        const existComment = await commentService.findComment(commentId , userId);
 
         if (!existComment) {
             console.log("There was no comment with this id sir :");
@@ -86,14 +63,7 @@ const editComment = async(req , res) => {
             return res.status(403).json({message: "You are not authorized to edit this comment sir :"});
         }
 
-        const editedComment = await prisma.comment.update({
-            where: {
-                id: Number(commentId)
-            },
-            data: {
-                text: comment
-            }
-        })
+        const editedComment = await commentService.editCommnet(commentId , comment)
 
         if (!editedComment) {
             console.log("There was an error to edit comment sir :");
@@ -113,12 +83,7 @@ const deleteComment = async(req , res) => {
         const userId = req.user.id;
         const commentId = req.params.id;
 
-         const existComment = await prisma.comment.findFirst({
-            where: {
-                id: Number(commentId),
-                userId: Number(userId)
-            }
-        })
+         const existComment = await commentService.deleteComment(commentId , userId);
 
         if (!existComment) {
             console.log("There was no comment with this id sir :");
@@ -129,11 +94,7 @@ const deleteComment = async(req , res) => {
             return res.status(403).json({message: "You are not authorized to delete this comment sir :"});
         }
 
-        const deletedComment = await prisma.comment.delete({
-            where: {
-                id: Number(commentId)
-            }
-        })
+        const deletedComment = await commentService.deleteComment(commentId , userId);
 
         if (!deletedComment) {
             console.log("There was an error to delete comment sir :");

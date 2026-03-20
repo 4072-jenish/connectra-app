@@ -1,8 +1,9 @@
-const prisma = require("../../prisma")
+const prisma = require("../../prisma");
+const userService = require("../Services/userService")
 
 const getAllUser = async(req , res) => {
       try {
-           const users = await prisma.user.findMany();
+           const users = await userService.getAlluser();
 
            if (!users) {
                 res.status(404).json({message: "No users found"});
@@ -39,25 +40,8 @@ const searchUser = async (req, res) => {
   try {
     const { search } = req.query;
 
-    const users = await prisma.user.findMany({
-      where: {
-        OR: [
-          {
-            name: {
-              contains: search,
-              mode: "insensitive"
-            }
-          },
-          {
-            email: {
-              contains: search,
-              mode: "insensitive"
-            }
-          }
-        ]
-      }
-    });
-
+    const users = await userService.searchUser(search);
+       
     res.json({ users });
 
   } catch (error) {

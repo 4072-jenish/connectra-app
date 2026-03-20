@@ -16,7 +16,9 @@ function CommentSection({ postId }) {
   // 🔹 Fetch comments
   const fetchComments = async () => {
     try {
+      console.log(postId);
       const { data } = await API.get(`/comment/allComment-post/${postId}`);
+      
       setComments(data || []);
     } catch (error) {
       console.log(error);

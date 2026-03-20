@@ -2,6 +2,7 @@ const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const bcrypt = require("bcrypt")
 const { PrismaClient } = require("@prisma/client")
+const userService = require('../Services/authService')
 
 const prisma = new PrismaClient()
 
@@ -11,9 +12,7 @@ passport.use(
     async (email, password, done) => {
       try {
 
-        const user = await prisma.user.findUnique({
-          where: { email }
-        })
+        const user = await userService.getUserByEmail(email);
 
         if (!user) {
           return done(null, false, { message: "User not found" })
@@ -41,9 +40,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
 
-    const user = await prisma.user.findUnique({
-      where: { id }
-    })
+    const user = await userService.getUserById(id)
 
     done(null, user)
 
