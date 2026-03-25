@@ -37,7 +37,7 @@ function LeftSidebar({ isOpen, onClose }: Props) {
    const navItems = [
     { path: "/feed", label: "Feed", icon: NavIcons.Home },
     { path: "/search", label: "Search", icon: NavIcons.Search },
-    { path: "/create", label: "Create", icon: NavIcons.Create },
+    { path: "/create-post", label: "Create", icon: NavIcons.Create },
     { path: "/users", label: "Users", icon: NavIcons.Profile }
   ];
 

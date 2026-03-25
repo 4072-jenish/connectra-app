@@ -2,25 +2,36 @@ import { Request, Response } from "express";
 import followService from "../Services/followService";
 
 export const getFollowData = async (req: Request, res: Response) => {
-  console.log(req.user);
-  
-  // const data = await followService.getFollowData(req.user?.id);
-  // return res.json(data);
+  try {
+    console.log(req.user);
+    const userId = req.user?.id as number;
+    
+    const data = await followService.getFollowData(userId);
+    return res.json(data);
+  } catch (error) {
+    console.error("getFollowData error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const toggleFollow = async (req: Request, res: Response) => {
-  console.log(req.user);
+  try {
+    console.log(req.user);
+    
+    const followerId = req.user?.id as number;
+    const followingId = Number(req.params.id);
+
+    const existing = await followService.findFollow(followerId, followingId);
   
-  // const followerId = req.user?.id;
-  // const followingId = Number(req.params.id);
+    if (existing) {
+      await followService.deleteFollow(followerId, followingId);
+      return res.json({ followed: false });
+    }
 
-  // const existing = await followService.findFollow(followerId, followingId);
- 
-  // if (existing) {
-  //   await followService.deleteFollow(followerId, followingId);
-  //   return res.json({ followed: false });
-  // }
-
-  // await followService.addFollow(followerId, followingId);
-  // return res.json({ followed: true });
+    await followService.addFollow(followerId, followingId);
+    return res.json({ followed: true });
+  } catch (error) {
+    console.error("toggleFollow error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };

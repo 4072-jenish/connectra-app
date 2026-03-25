@@ -4,6 +4,7 @@ import { Icons } from "../utils/icons";
 import CommentSection from "./CommentSection";
 import { RootState, AppDispatch } from "../store";
 import { getLikes, toggleLike } from "../Services/Actions/likeAction";
+import "../styles/postcard.css";
 
 interface Post {
   id: number;
@@ -49,7 +50,7 @@ function PostCard({ post, index }: Props) {
 
       {/* Post Header */}
       <div className="post-header">
-        <div className="post-user">
+        <div className="post-user"> 
           <div className="post-avatar">
             {post.author?.avatar ? (
               <img src={post.author.avatar} alt={post.author.name} />

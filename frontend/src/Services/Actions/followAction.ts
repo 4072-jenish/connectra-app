@@ -3,11 +3,23 @@ import { AppDispatch, FollowData } from "../../types";
 
 export const getFollowData = () => async (dispatch: AppDispatch) => {
   try {
-    const { data }: { data: FollowData } = await API.get("/follow/getFollowData");
+    const { data } = await API.get("/follow/getFollowData");
+
+    // Backend returns:
+    // { followers: [{ ...followFields, follower: {id,name,email,avatar} }], following: [...] }
+    // Frontend expects `followers` to be a flat `User[]`.
+    const followersUsers =
+      (data?.followers || [])
+        .map((f: any) => f?.follower)
+        .filter(Boolean) || [];
+
+    // Following items from backend don't include user details (only ids).
+    // Keep it empty to avoid rendering incorrect shapes.
+    const followingUsers: never[] = [];
 
     dispatch({
       type: "GET_FOLLOW_DATA",
-      payload: data,
+      payload: { followers: followersUsers, following: followingUsers } satisfies FollowData,
     });
   } catch (error: unknown) {
     console.log(error);

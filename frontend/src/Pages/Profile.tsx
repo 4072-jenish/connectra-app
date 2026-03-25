@@ -29,7 +29,7 @@ function Profile() {
   const isOwnProfile = !id || Number(id) === loggedInUserId;
 
   const handleEditProfile = () => {
-    navigate("/edit-profile");
+    navigate("/editProfile");
   };
 
   // ✅ FETCH PROFILE

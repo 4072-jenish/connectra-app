@@ -39,10 +39,13 @@ function Search() {
 
     saveSearch(query);
 
+
     try {
       setLoading(true);
       const { data } = await API.get(`/user/search?search=${query}`);
-      setUsers(data.users || []);
+      console.log(data);
+      
+      setUsers(data || []);
     } catch (error) {
       console.error("Search error:", error);
     } finally {

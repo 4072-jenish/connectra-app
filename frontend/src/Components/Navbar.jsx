@@ -1,15 +1,22 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Icons, NavIcons } from "../utils/icons";
-import "../styles/Navbar.css";
+import "../styles/navbar.css";
 import "../styles/globle.css";
 
 function Navbar() {
   const location = useLocation();
 
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  const navItems = [
+    { path: "/feed", label: "Feed", icon: NavIcons.Home },
+    { path: "/search", label: "Search", icon: NavIcons.Search },
+    { path: "/create-post", label: "Create", icon: NavIcons.Create },
+    { path: "/users", label: "Users", icon: NavIcons.Profile },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {

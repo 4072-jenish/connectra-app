@@ -17,7 +17,7 @@ commentRouter.get(
   "/allComment-post/:id",
   authMiddleware,
   validateParams(idParamSchema),
-  allCommentPost
+  allCommentPost 
 );
 
 commentRouter.post(

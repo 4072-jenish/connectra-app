@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Icons } from "../utils/icons";
-import { RootState, AppDispatch } from "../store";
+import { RootState, AppDispatch } from "../Services/store";
 import { addComment, deleteComment, editComment, getComments } from "../Services/Actions/commnetAction";
+import "../styles/commentsSection.css";
 
 interface CommentType {
   id: number;

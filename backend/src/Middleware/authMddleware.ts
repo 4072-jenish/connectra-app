@@ -38,10 +38,14 @@ const authMiddleware = async (
     if (!existUser) {
       return res.status(401).json({ message: "User not found" });
     }
-    console.log(existUser);
+    console.log("existing user from middleware" ,existUser);
     
     req.user = existUser; 
 
+    console.log(req.user);
+    
+    console.log("leaving the auth middleware");
+    
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid token" });

@@ -14,6 +14,24 @@
   margin-right: 320px;
   padding: 2rem;
   min-height: 100vh;
+  width: calc(100% - 400px);
+}
+
+/* When the left sidebar is expanded, reserve its additional width. */
+.left-sidebar.expanded ~ .search-main {
+  margin-left: 250px;
+  width: calc(100% - 570px);
+}
+
+@media (max-width: 1200px) {
+  .search-main {
+    margin-right: 280px;
+    width: calc(100% - 360px);
+  }
+
+  .left-sidebar.expanded ~ .search-main {
+    width: calc(100% - 530px);
+  }
 }
 
 .search-container {
@@ -474,6 +492,7 @@
 @media (max-width: 1024px) {
   .search-main {
     margin-right: 0;
+    width: calc(100% - 80px);
   }
 }
 
@@ -481,6 +500,7 @@
   .search-main {
     margin-left: 0;
     padding: 1rem;
+    width: 100%;
   }
 
   .search-bar {
