@@ -6,15 +6,16 @@ import "../styles/globle.css";
 
 function Navbar() {
   const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  const [scrolled, setScrolled] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    
+
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) {
@@ -22,22 +23,14 @@ function Navbar() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const navItems = [
-    { path: "/feed", icon: NavIcons.Home, label: "Feed" },
-    { path: "/create-post", icon: NavIcons.Create, label: "Create" },
-    { path: "/users", icon: Icons.Users, label: "Users" },
-    { path: "/followers", icon: Icons.UserFollow, label: "Followers" },
-    { path: "/profile", icon: NavIcons.Profile, label: "Profile" },
-  ];
 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
