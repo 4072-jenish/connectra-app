@@ -2,13 +2,13 @@ import { Router } from "express";
 import {
   allLikewithPost,
   toggleLike,
-} from "../Controller/likeController";
+} from "../controller/likeController";
 
-import authMiddleware from "../Middleware/authMddleware";
+import authMiddleware from "../middleware/authMddleware";
 
 const likeRouter = Router();
 
 likeRouter.get("/allLike-post/:id", authMiddleware, allLikewithPost);
 likeRouter.post("/toggleLike/:id", authMiddleware, toggleLike);
 
-export default likeRouter;
+export default likeRouter; 

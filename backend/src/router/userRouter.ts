@@ -3,9 +3,9 @@ import {
   getAllUser,
   singleUser,
   searchUser,
-} from "../Controller/userController";
+} from "../controller/userController";
 
-import authMiddleware from "../Middleware/authMddleware";
+import authMiddleware from "../middleware/authMddleware";
 
 const userRouter = Router();
 

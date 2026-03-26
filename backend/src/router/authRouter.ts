@@ -6,18 +6,18 @@ import {
   deleteUser,
   userProfile,
   verifyOTP,
-} from "../Controller/authController";
+} from "../controller/authController";
 
-import authMiddleware from "../Middleware/authMddleware";
-import upload from "../Middleware/upload";
+import authMiddleware from "../middleware/authMddleware";
+import upload from "../middleware/upload";
 
-import { validateBody, validateParams } from "../Middleware/validate";
+import { validateBody, validateParams } from "../middleware/validate";
 import {
   registerSchema,
   loginSchema,
   verifyOtpSchema,
-} from "../Validation/authValidation";
-import { idParamSchema } from "../Validation/commonValidation";
+} from "../validation/authValidation";
+import { idParamSchema } from "../validation/commonValidation";
 
 const authRouter = Router();
 

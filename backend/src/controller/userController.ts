@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../../prisma/prisma";
-import userService from "../Services/userService";
+import userService from "../services/userService";
 
 export const getAllUser = async (_: Request, res: Response) => {
   try {

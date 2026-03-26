@@ -4,12 +4,12 @@ import {
   addComment,
   editComment,
   deleteComment,
-} from "../Controller/commentController";
+} from "../controller/commentController";
 
-import authMiddleware from "../Middleware/authMddleware";
-import { validateBody, validateParams } from "../Middleware/validate";
-import { commentSchema } from "../Validation/commentValidation";
-import { idParamSchema } from "../Validation/commonValidation";
+import authMiddleware from "../middleware/authMddleware";
+import { validateBody, validateParams } from "../middleware/validate";
+import { commentSchema } from "../validation/commentValidation";
+import { idParamSchema } from "../validation/commonValidation";
 
 const commentRouter = Router();
 

@@ -26,7 +26,7 @@ export const followReducer = (
     case "FOLLOW_USER":
       return {
         ...state,
-        following: [...state.following, action.payload],
+        following: state.following,
       };
 
     default:

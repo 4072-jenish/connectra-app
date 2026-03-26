@@ -1,6 +1,8 @@
 import { Dispatch } from "redux";
 
 export interface User {
+  postsCount: number;
+  followersCount: number;
   id: number;
   name: string;
   email: string;

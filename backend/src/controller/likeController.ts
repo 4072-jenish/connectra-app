@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import likeService from "../Services/likeService";
+import likeService from "../services/likeService";
 
 export const allLikewithPost = async (req: Request, res: Response) => {
   try {
-    const paramId = Number(req.params.id) ;
-    console.log(typeof(paramId));
+    const paramId = Number(req.params.id);
     
     
     const likes = await likeService.getAllLikes(paramId);

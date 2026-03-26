@@ -5,10 +5,10 @@ import {
   userPost,
   editPost,
   deletePost,
-} from "../Controller/postController";
+} from "../controller/postController";
 
-import authMiddleware from "../Middleware/authMddleware";
-import upload from "../Middleware/upload";
+import authMiddleware from "../middleware/authMddleware";
+import upload from "../middleware/upload";
 
 const postRouter = Router();
 

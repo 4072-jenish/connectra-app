@@ -20,7 +20,7 @@ export const getLikes = (postId: number, userId: number) => async (dispatch: App
       postId
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -36,6 +36,6 @@ export const toggleLike = (postId: number) => async (dispatch: AppDispatch) => {
     const userId = Number(localStorage.getItem("userId") || 0);
     dispatch(getLikes(postId, userId) as any);
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };

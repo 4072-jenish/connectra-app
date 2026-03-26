@@ -17,26 +17,31 @@ export const getProfile = (id?: number) => async (dispatch: AppDispatch) => {
         following: (data.following || []).map((f: any) => f.following || f),
       };
     } else {
-      const [postsRes, userRes, followRes] = await Promise.all([
+      const [postsRes, userRes] = await Promise.all([
         API.get("/post/userPost"),
         API.get("/auth/userProfile"),
-        API.get("/follow/getFollowData"),
       ]);
 
+      const user = userRes.data.user || userRes.data;
+
       payload = {
-        user: userRes.data.user || userRes.data,
+        user,
         posts: postsRes.data,
-        followers: followRes.data.followers || [],
-        following: followRes.data.following || [],
+        followers: (user.followers || []).map((f: any) => f.follower || f),
+        following: (user.following || []).map((f: any) => f.following || f),
       };
     }
 
     dispatch({
-      type: "GET_PROFILE",
+      type: id ? "GET_OTHER_PROFILE" : "GET_MY_PROFILE",
       payload,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    dispatch({
+      type: "PROFILE_ERROR",
+      payload: "We couldn't load that profile. Please try again.",
+    });
   }
 };
 
@@ -49,7 +54,7 @@ export const deletePost = (postId: number) => async (dispatch: AppDispatch) => {
       payload: postId,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -63,6 +68,6 @@ export const deleteAccount = () => async (dispatch: AppDispatch) => {
 
     window.location.href = "/";
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };

@@ -10,7 +10,7 @@ export const getComments = (postId: number) => async (dispatch: AppDispatch) => 
       payload: data || [],
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -25,7 +25,7 @@ export const addComment = (postId: number, text: string) => async (dispatch: App
       payload: data,
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -38,7 +38,7 @@ export const deleteComment = (id: number) => async (dispatch: AppDispatch) => {
       payload: id,
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -53,6 +53,6 @@ export const editComment = (id: number, text: string) => async (dispatch: AppDis
       payload: { id, text },
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };

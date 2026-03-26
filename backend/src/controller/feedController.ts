@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import followService from "../Services/followService";
-import postService from "../Services/postService";
+import followService from "../services/followService";
+import postService from "../services/postService";
 
 export const feedContent = async (req: Request, res: Response) => {
   try {

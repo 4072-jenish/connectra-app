@@ -19,13 +19,13 @@ function LeftSidebar({ isOpen, onClose }: Props) {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.profile);
+  const { currentUser  } = useSelector((state: RootState) => state.profile);
    
   useEffect(() => {
-    if (!user) {
+    if (!currentUser) {
     dispatch(getUserProfile());
   }
-  }, [dispatch , user]);
+  }, [dispatch , currentUser]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -78,16 +78,16 @@ function LeftSidebar({ isOpen, onClose }: Props) {
         })}
       </nav>
 
-      {user && (
-        <Link to="/profile" className="user-info">
+      {currentUser && (
+        <Link to="/profile" className="user-info" onClick={onClose}>
           <div className="user-avatar-small">
-            {user.avatar ? <img src={user.avatar} alt={user.name} /> : <Icons.User />}
+            {currentUser.avatar ? <img src={currentUser.avatar} alt={currentUser.name} /> : <Icons.User />}
           </div>
 
           {(expanded || !isMobile) && (
             <div className="user-details">
-              <span className="username">@{user.name || user.name}</span>
-              <span className="user-fullname">{user.name}</span>
+              <span className="username">@{currentUser.name}</span>
+              <span className="user-fullname">{currentUser.name}</span>
             </div>
           )}
         </Link>

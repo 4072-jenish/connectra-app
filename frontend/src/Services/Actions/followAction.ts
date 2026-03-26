@@ -21,7 +21,7 @@ export const getFollowData = () => async (dispatch: AppDispatch) => {
       payload: { followers: followersUsers, following: followingUsers } satisfies FollowData,
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -34,6 +34,6 @@ export const followUser = (id: number) => async (dispatch: AppDispatch) => {
       payload: id,
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };

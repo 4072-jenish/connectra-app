@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import followService from "../Services/followService";
+import followService from "../services/followService";
 
 export const getFollowData = async (req: Request, res: Response) => {
   try {

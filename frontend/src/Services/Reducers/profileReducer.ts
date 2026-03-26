@@ -11,19 +11,23 @@ interface Post {
 }
 
 interface ProfileState {
-  user: User | null;
+  currentUser: User | null;
+  profileUser: User | null;
   posts: Post[];
   followers: User[];
   following: User[];
   loading: boolean;
+  error: string | null;
 }
 
 const initialState: ProfileState = {
-  user: null,
+  currentUser: null,
+  profileUser: null,
   posts: [],
   followers: [],
   following: [],
   loading: false,
+  error: null,
 };
 
 export const profileReducer = (
@@ -31,17 +35,43 @@ export const profileReducer = (
   action: AnyAction
 ): ProfileState => {
   switch (action.type) {
-    case "PROFILE_LOADING":
-      return { ...state, loading: true };
-
-    case "GET_PROFILE":
+    case "GET_USER":
       return {
         ...state,
-        user: action.payload.user,
+        currentUser: action.payload,
+      };
+
+    case "PROFILE_LOADING":
+      return { ...state, loading: true, error: null };
+
+    case "PROFILE_ERROR":
+      return {
+        ...state,
+        loading: false,
+        error: action.payload || "Unable to load profile right now.",
+      };
+
+    case "GET_MY_PROFILE":
+      return {
+        ...state,
+        currentUser: action.payload.user,
+        profileUser: null,
         posts: action.payload.posts,
         followers: action.payload.followers,
         following: action.payload.following,
         loading: false,
+        error: null,
+      };
+      
+    case "GET_OTHER_PROFILE":
+      return {
+        ...state,
+        profileUser: action.payload.user,
+        posts: action.payload.posts,
+        followers: action.payload.followers,
+        following: action.payload.following,
+        loading: false,
+        error: null,
       };
 
     case "DELETE_POST":

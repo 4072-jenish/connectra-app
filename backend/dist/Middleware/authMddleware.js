@@ -33,7 +33,6 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         if (!existUser) {
             return res.status(401).json({ message: "User not found" });
         }
-        console.log("existing user from middleware", existUser);
         req.user = existUser;
         next();
     }

@@ -40,12 +40,14 @@ function PostCard({ post, index }: Props) {
     if (isLiking) return;
 
     setIsLiking(true);
-    dispatch(toggleLike(post.id) as any);
+    dispatch(toggleLike(post.id) as any); 
     setIsLiking(false);
   };
 
   useEffect(() => {
-    dispatch(getLikes(post.id, userId));
+    if (!likesByPost[post.id]) {
+      dispatch(getLikes(post.id, userId));
+    }
   }, [post.id, dispatch, userId]);
 
   return (

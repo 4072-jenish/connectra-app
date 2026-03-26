@@ -5,7 +5,7 @@ import "../styles/globle.css";
 import { Icons } from "../utils/icons";
 import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../store";
-import { followUser, getFollowData } from "../Services/Actions/followAction";
+import { getFollowData } from "../Services/Actions/followAction";
 import { getUserProfile } from "../Services/Actions/authAction";
 
 interface Props {
@@ -17,15 +17,17 @@ function RightSidebar({ isOpen, onClose }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { followers, following } = useSelector((state: RootState) => state.follow);
-  const { user } = useSelector((state: RootState) => state.profile);
+  const { followers } = useSelector((state: RootState) => state.follow);
+  const { currentUser } = useSelector((state: RootState) => state.profile);
 
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 1024);
 
   useEffect(() => {
     dispatch(getFollowData());
-    dispatch(getUserProfile());
-  }, [dispatch]);
+    if (!currentUser) {
+      dispatch(getUserProfile());
+    }
+  }, [currentUser, dispatch]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -35,10 +37,6 @@ function RightSidebar({ isOpen, onClose }: Props) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleFollow = (id: number) => {
-    dispatch(followUser(id));
-  };
-
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
@@ -47,6 +45,11 @@ function RightSidebar({ isOpen, onClose }: Props) {
 
   const handleProfileClick = (userId: number) => {
     navigate(`/profile/${userId}`);
+    onClose();
+  };
+
+  const handleOwnProfileClick = () => {
+    navigate("/profile");
     onClose();
   };
 
@@ -60,21 +63,37 @@ function RightSidebar({ isOpen, onClose }: Props) {
         )}
 
         {/* Profile Card */}
-        <div className="profile-card">
+        <div
+          className="profile-card"
+          onClick={handleOwnProfileClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleOwnProfileClick();
+            }
+          }}
+        >
           <div className="profile-avatar-large">
-            {user?.avatar ? (
-              <img src={user.avatar} alt={user.name} />
+            {currentUser?.avatar ? (
+              <img src={currentUser.avatar} alt={currentUser.name} />
             ) : (
               <Icons.User />
             )}
           </div>
 
           <div className="profile-info">
-            <span>@{user?.name || user?.name}</span>
-            <span>{user?.name}</span>
+            <span>@{currentUser?.name}</span>
+            <span>{currentUser?.name}</span>
           </div>
 
-          <button className="switch-btn" onClick={logout}>
+          <button
+            className="switch-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              logout();
+            }}
+          >
             <Icons.Logout /> Switch
           </button>
         </div>
@@ -94,7 +113,7 @@ function RightSidebar({ isOpen, onClose }: Props) {
               </div>
             ) : (
               followers
-                .filter((f: any) => !user?.id || f?.id !== user.id)
+                .filter((f: any) => !currentUser?.id || f?.id !== currentUser.id)
                 .map((f: any, index: number) => (
                 <div
                   key={f.id}

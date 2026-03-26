@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
-import userService from "../Services/authService";
+import userService from "../services/authService";
 
 passport.use(
   new LocalStrategy(

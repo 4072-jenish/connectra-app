@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import API from "../Services/axios";
+import { User } from "../types";
 import LeftSidebar from "../Components/LeftSidebar";
 import RightSidebar from "../Components/RightSidebar";
 import { Icons } from "../utils/icons";
@@ -8,7 +9,7 @@ import "../styles/globle.css";
 
 function Search() {
   const [query, setQuery] = useState<string>("");
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [leftOpen, setLeftOpen] = useState(true);
@@ -33,18 +34,10 @@ function Search() {
     localStorage.setItem("recentSearches", JSON.stringify(updated));
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-
-    saveSearch(query);
-
-
+  const runSearch = async (searchValue: string) => {
     try {
       setLoading(true);
-      const { data } = await API.get(`/user/search?search=${query}`);
-      console.log(data);
-      
+      const { data } = await API.get(`/user/search?search=${searchValue}`);
       setUsers(data || []);
     } catch (error) {
       console.error("Search error:", error);
@@ -53,13 +46,20 @@ function Search() {
     }
   };
 
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) return;
+
+    saveSearch(trimmedQuery);
+    await runSearch(trimmedQuery);
+  };
+
   const handleRecentClick = (searchTerm: string) => {
     setQuery(searchTerm);
-
-    const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-    setTimeout(() => {
-      handleSearch(fakeEvent);
-    }, 100);
+    saveSearch(searchTerm);
+    void runSearch(searchTerm);
   };
 
   const clearRecent = () => {
@@ -166,7 +166,7 @@ function Search() {
                     <div className="user-info">
                       <h4>
                         {user.name}
-                        {user.username && <span>@{user.username}</span>}
+                        {user.name && <span>@{user.name}</span>}
                       </h4>
                       <p>{user.bio || "No bio yet"}</p>
                       <div className="user-meta">

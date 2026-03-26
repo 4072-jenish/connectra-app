@@ -4,7 +4,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
 import sgMail from "@sendgrid/mail";
-import userService from "../Services/authService";
+import userService from "../services/authService";
 
 // interface AuthRequest extends Request {
 //   user : AuthUser
@@ -51,9 +51,19 @@ export const regUser = async (req: Request, res: Response): Promise<Response> =>
     await sgMail.send({
       to: email,
       from: "hariyanijenish@gmail.com",
-      subject: "Verify Email",
-      html: `<h1>${otp}</h1>`,
+      subject: "Your Connectra verification code",
+      text: `Your verification code is ${otp}. It expires in 10 minutes.`,
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Connectra Email Verification</h2>
+          <p>Your verification code is:</p>
+          <h1>${otp}</h1>
+          <p>This code will expire in 10 minutes.</p>
+          <p>If you did not request this, you can ignore this email.</p>
+        </div>
+      `,
     });
+
 
     return res.status(201).json({ message: "OTP sent", email: newUser.email });
   } catch (error) {

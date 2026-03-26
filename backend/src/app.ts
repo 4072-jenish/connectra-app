@@ -6,8 +6,8 @@ dotenv.config();
 import express from "express";
 import session from "express-session";
 import cors from "cors";
-import passport from "./Utils/passport";
-import indexRouter from "./Router/indexRouter";
+import passport from "./utils/passport";
+import indexRouter from "./router/indexRouter";
 
 const app = express();
 

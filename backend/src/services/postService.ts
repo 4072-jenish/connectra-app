@@ -1,5 +1,5 @@
 import prisma from "../../prisma/prisma";
-import cloudinary from "../Utils/cloudinary";
+import cloudinary from "../utils/cloudinary";
 
  const getAllPosts = async () => {
   try {

@@ -17,7 +17,6 @@ const likeService_1 = __importDefault(require("../Services/likeService"));
 const allLikewithPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const paramId = Number(req.params.id);
-        console.log(typeof (paramId));
         const likes = yield likeService_1.default.getAllLikes(paramId);
         return res.json(likes);
     }

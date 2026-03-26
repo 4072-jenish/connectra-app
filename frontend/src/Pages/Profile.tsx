@@ -11,6 +11,7 @@ import {
   deletePost,
   deleteAccount,
 } from "../Services/Actions/profileAction";
+import API from "../Services/axios";
 
 function Profile() {
   const navigate = useNavigate();
@@ -18,25 +19,75 @@ function Profile() {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { user, posts, followers, following, loading } = useSelector(
-    (state: RootState) => state.profile
-  );
+  const loggedInUserId = Number(localStorage.getItem("userId") || 0);
+  const isOwnProfile = !id || Number(id) === loggedInUserId;
+
+  const { currentUser, profileUser, posts, followers, following, loading, error } =
+    useSelector((state: RootState) => state.profile);
+  const displayUser = isOwnProfile ? currentUser : profileUser;
 
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
-
-  const loggedInUserId = Number(localStorage.getItem("userId") || 0);
-  const isOwnProfile = !id || Number(id) === loggedInUserId;
 
   const handleEditProfile = () => {
     navigate("/editProfile");
   };
 
+    const followUser = async (id: number) => {
+    try {
+      await API.post(`/follow/followUser/${id}`);
+    } catch (error) {
+      console.error("Follow error:", error);
+    }
+  };
+
   useEffect(() => {
     dispatch(getProfile(id ? Number(id) : undefined));
-  }, [id]);
+    setShowFollowers(false);
+    setShowFollowing(false);
+  }, [dispatch, id]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <div className="no-posts">
+          <Icons.Refresh className="no-posts-icon spinning" />
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <div className="no-posts">
+          <Icons.Info className="no-posts-icon" />
+          <p>{error}</p>
+          <button
+            className="edit-profile-btn"
+            onClick={() => dispatch(getProfile(id ? Number(id) : undefined))}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!displayUser) {
+    return (
+      <div className="profile-container">
+        <div className="no-posts">
+          <Icons.User className="no-posts-icon" />
+          <p>Profile not found.</p>
+          <button className="edit-profile-btn" onClick={() => navigate("/feed")}>
+            Back to Feed
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
@@ -51,8 +102,8 @@ function Profile() {
 
         <div className="profile-info">
           <div className="profile-avatar-wrapper">
-            {user?.avatar ? (
-              <img src={user.avatar} alt={user.name} className="profile-avatar" />
+            {displayUser?.avatar ? (
+              <img src={displayUser.avatar} alt={displayUser.name} className="profile-avatar" />
             ) : (
               <div className="profile-avatar-placeholder">
                 <Icons.User />
@@ -62,7 +113,7 @@ function Profile() {
 
           <div className="profile-details">
             <div className="profile-name-wrapper">
-              <h1 className="profile-name">{user?.name}</h1>
+              <h1 className="profile-name">{displayUser?.name}</h1>
 
               {isOwnProfile && (
                 <div className="profile-actions">
@@ -84,7 +135,7 @@ function Profile() {
             </div>
 
             <p className="profile-bio">
-              <Icons.Info /> {user?.bio || "No bio yet"}
+              <Icons.Info /> {displayUser?.bio || "No bio yet"}
             </p>
 
             <div className="profile-stats">
@@ -122,13 +173,17 @@ function Profile() {
 
       <div className="profile-content">
         <h2 className="posts-title">
-          <Icons.Image /> My Posts
+          <Icons.Image /> {isOwnProfile ? "My Posts" : `${displayUser.name}'s Posts`}
         </h2>
 
         {posts.length === 0 ? (
           <div className="no-posts">
             <Icons.Create className="no-posts-icon" />
-            <p>No posts yet. Create your first post!</p>
+            <p>
+              {isOwnProfile
+                ? "No posts yet. Create your first post!"
+                : "No posts yet."}
+            </p>
           </div>
         ) : (
           <div className="posts-grid">
@@ -211,9 +266,16 @@ function Profile() {
                     </div>
 
                     <div className="follower-info">
-                      <span>@{u.name || u.name}</span>
+                      <span>@{u.name}</span>
                       <span>{u.name}</span>
                     </div>
+
+                     <button
+                       className="follow-btn"
+                       onClick={() => followUser(u.id)}
+                     >
+                       <Icons.Follow /> Follow
+                     </button>
                   </div>
                 ))
               )}
@@ -258,7 +320,7 @@ function Profile() {
                     </div>
 
                     <div className="follower-info">
-                      <span>@{u.name || u.name}</span>
+                      <span>@{u.name}</span>
                       <span>{u.name}</span>
                     </div>
                   </div>

@@ -3,13 +3,14 @@ import { AppDispatch, User } from "../../types";
 
 export const getUserProfile = () => async (dispatch: AppDispatch) => {
   try {
-    const { data }: { data: { user: User } } = await API.get("/auth/userProfile");
+    const { data }: { data: User | { user: User } } = await API.get("/auth/userProfile");
+    const user = "user" in data ? data.user : data;
 
     dispatch({
       type: "GET_USER",
-      payload: data.user,
+      payload: user,
     });
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
   }
 };

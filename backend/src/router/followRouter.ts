@@ -2,11 +2,11 @@ import { Router } from "express";
 import {
   toggleFollow,
   getFollowData,
-} from "../Controller/followerController";
+} from "../controller/followerController";
 
-import authMiddleware from "../Middleware/authMddleware";
-import { validateParams } from "../Middleware/validate";
-import { idParamSchema } from "../Validation/commonValidation";
+import authMiddleware from "../middleware/authMddleware";
+import { validateParams } from "../middleware/validate";
+import { idParamSchema } from "../validation/commonValidation";
 
 const followRouter = Router();
 

@@ -87,7 +87,7 @@ function EditProfile() {
       navigate("/profile");
     },
     onError: (err) => {
-      console.log("Update error:", err);
+      console.error("Update error:", err);
     }
   });
 

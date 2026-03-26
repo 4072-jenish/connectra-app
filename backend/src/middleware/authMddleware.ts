@@ -35,7 +35,6 @@ const authMiddleware = async (
     if (!existUser) {
       return res.status(401).json({ message: "User not found" });
     }
-    console.log("existing user from middleware" ,existUser);
     
     req.user = existUser;
     
