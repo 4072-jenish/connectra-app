@@ -3,8 +3,9 @@ import likeService from "../Services/likeService";
 
 export const allLikewithPost = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
-    const paramId = req.params.id as unknown as number ;
+    const paramId = Number(req.params.id) ;
+    console.log(typeof(paramId));
+    
     
     const likes = await likeService.getAllLikes(paramId);
     return res.json(likes);
@@ -16,7 +17,6 @@ export const allLikewithPost = async (req: Request, res: Response) => {
 
 export const toggleLike = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     
     const userId = req.user?.id as number;
     const postId = Number(req.params.id);

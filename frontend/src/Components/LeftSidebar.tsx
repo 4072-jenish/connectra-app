@@ -19,11 +19,13 @@ function LeftSidebar({ isOpen, onClose }: Props) {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
-
+  const { user } = useSelector((state: RootState) => state.profile);
+   
   useEffect(() => {
+    if (!user) {
     dispatch(getUserProfile());
-  }, [dispatch]);
+  }
+  }, [dispatch , user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -38,7 +40,8 @@ function LeftSidebar({ isOpen, onClose }: Props) {
     { path: "/feed", label: "Feed", icon: NavIcons.Home },
     { path: "/search", label: "Search", icon: NavIcons.Search },
     { path: "/create-post", label: "Create", icon: NavIcons.Create },
-    { path: "/users", label: "Users", icon: NavIcons.Profile }
+    { path: "/users", label: "Users", icon: NavIcons.Profile },
+
   ];
 
   return (

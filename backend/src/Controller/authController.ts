@@ -93,10 +93,15 @@ export const loginUser = (req: Request, res: Response, next: NextFunction): void
 
 export const userProfile = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
+    const targetIdRaw = req.params?.id;
+    const targetId = targetIdRaw ? Number(targetIdRaw) : (req.user?.id as number);
 
-    // const user = await userService.getUserById(req.user?.id);
-    // return res.json(user);
+    if (!targetId || Number.isNaN(targetId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const user = await userService.getFullUserProfile(targetId);
+    return res.json(user);
   } catch (error) {
     console.error("userProfile error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -105,8 +110,10 @@ export const userProfile = async (req: Request, res: Response) => {
 
 export const editUser = async (req: Request, res: Response) => {
   try {
-    // const user = await userService.editedUser(req.user?.id, req.body);
-    // return res.json({ user });
+    const userId = req.user?.id as number;
+
+    const user = await userService.editedUser(userId, req.body);
+    return res.json({ user });
   } catch (error) {
     console.error("editUser error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -115,8 +122,9 @@ export const editUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    // const user = await userService.deleteUserWithRelation(req.user?.id);
-    // return res.json({ user });
+    const userId = req.user?.id as number;
+    const user = await userService.deleteUserWithRelation(userId);
+    return res.json({ user });
   } catch (error) {
     console.error("deleteUser error:", error);
     return res.status(500).json({ message: "Internal server error" });

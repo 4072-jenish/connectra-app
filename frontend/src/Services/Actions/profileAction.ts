@@ -24,7 +24,7 @@ export const getProfile = (id?: number) => async (dispatch: AppDispatch) => {
       ]);
 
       payload = {
-        user: userRes.data.user,
+        user: userRes.data.user || userRes.data,
         posts: postsRes.data,
         followers: followRes.data.followers || [],
         following: followRes.data.following || [],

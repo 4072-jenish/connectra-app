@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import prisma from "../../prisma/prisma";
 
  const getFollowData = async (userId: number) => {
   try {

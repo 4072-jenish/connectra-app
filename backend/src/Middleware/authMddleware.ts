@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import prisma from "../prisma";
+import prisma from "../../prisma/prisma";
 
-interface JwtPayload {
-  email: string;
-}
 
 const authMiddleware = async (
   req: Request,
@@ -40,11 +37,7 @@ const authMiddleware = async (
     }
     console.log("existing user from middleware" ,existUser);
     
-    req.user = existUser; 
-
-    console.log(req.user);
-    
-    console.log("leaving the auth middleware");
+    req.user = existUser;
     
     next();
   } catch (error) {

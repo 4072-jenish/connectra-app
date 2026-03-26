@@ -8,7 +8,6 @@ export const validateBody =
       req.body = schema.parse(req.body);
       next();
     } catch (error: any) {
-      // Useful during debugging: tells you exactly which field failed and why.
       console.error("validateBody failed:", JSON.stringify(error?.errors ?? error));
       return res.status(400).json({
         errors: error.errors.map((e: any) => ({
@@ -23,7 +22,6 @@ export const validateParams =
   (schema: ZodSchema) =>
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("Comming from validation");
       
       req.params = schema.parse(req.params) as typeof req.params;
       next();

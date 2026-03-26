@@ -13,12 +13,9 @@ export const allPosts = async (_: Request, res: Response) => {
 
 export const addPost = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     const userId = req.user?.id as number;
     const content = req.body.content as string;
     const file = req.file as Express.Multer.File;
-
-    console.log(userId , content , file);
     
     const post = await postService.createPost(
       userId,
@@ -35,12 +32,9 @@ export const addPost = async (req: Request, res: Response) => {
 
 export const editPost = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     const userId = req.user?.id as number;
     const content = req.body.content as string;
     const file = req.file as Express.Multer.File;
-
-    console.log(userId , content , file);
     
     const post = await postService.updatePost(
       Number(req.params.id),
@@ -58,7 +52,6 @@ export const editPost = async (req: Request, res: Response) => {
 
 export const userPost = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     const userId = req.user?.id as number;
 
     const posts = await postService.getPostsByUser(userId);
@@ -71,7 +64,6 @@ export const userPost = async (req: Request, res: Response) => {
 
 export const deletePost = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     const userId = req.user?.id as number;
     const paramsId = req.params.id as unknown as number;
     

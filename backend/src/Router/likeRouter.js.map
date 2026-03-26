@@ -1,1 +1,0 @@
-{"version":3,"file":"likeRouter.js","sourceRoot":"","sources":["likeRouter.ts"],"names":[],"mappings":";;;;;AAAA,qCAAiC;AACjC,iEAGsC;AAEtC,gFAAyD;AAEzD,MAAM,UAAU,GAAG,IAAA,gBAAM,GAAE,CAAC;AAE5B,UAAU,CAAC,GAAG,CAAC,mBAAmB,EAAE,uBAAc,EAAE,gCAAe,CAAC,CAAC;AACrE,UAAU,CAAC,IAAI,CAAC,iBAAiB,EAAE,uBAAc,EAAE,2BAAU,CAAC,CAAC;AAE/D,kBAAe,UAAU,CAAC"}

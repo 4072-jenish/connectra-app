@@ -27,8 +27,11 @@ function PostCard({ post, index }: Props) {
   const userId = Number(localStorage.getItem("userId"));
 
   const dispatch = useDispatch<AppDispatch>();
-  const { likes, isLiked } = useSelector((state: RootState) => state.likes);
-
+  const { likesByPost } = useSelector((state: RootState) => state.likes);
+  const postLikeData = likesByPost[post.id] || {
+    count: 0,
+    isLiked: false,
+  };
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [showComments, setShowComments] = useState<boolean>(false);
   const [isLiking, setIsLiking] = useState<boolean>(false);
@@ -37,7 +40,7 @@ function PostCard({ post, index }: Props) {
     if (isLiking) return;
 
     setIsLiking(true);
-    dispatch(toggleLike(post.id));
+    dispatch(toggleLike(post.id) as any);
     setIsLiking(false);
   };
 
@@ -92,11 +95,11 @@ function PostCard({ post, index }: Props) {
 
           {/* Like */}
           <button
-            className={`action-btn like-btn ${isLiked ? "liked" : ""}`}
+            className={`action-btn like-btn ${postLikeData.isLiked ? "liked" : ""}`}
             onClick={handleLike}
             disabled={isLiking}
           >
-            {isLiked ? <Icons.Liked /> : <Icons.Like />}
+            {postLikeData.isLiked ? <Icons.Liked /> : <Icons.Like />}
           </button>
 
           {/* Comment */}
@@ -126,7 +129,7 @@ function PostCard({ post, index }: Props) {
 
       <div className="post-stats">
         <span className="likes-count">
-          <Icons.Heart /> {likes} likes
+          <Icons.Heart /> {postLikeData.count} likes
         </span>
       </div>
 

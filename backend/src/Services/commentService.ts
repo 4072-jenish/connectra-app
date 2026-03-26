@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import prisma from "../../prisma/prisma";
 import { Comment } from "@prisma/client";
 
  const allCommentOfPost = async (postId: number) => {

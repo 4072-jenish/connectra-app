@@ -3,7 +3,6 @@ import followService from "../Services/followService";
 
 export const getFollowData = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     const userId = req.user?.id as number;
     
     const data = await followService.getFollowData(userId);
@@ -16,7 +15,6 @@ export const getFollowData = async (req: Request, res: Response) => {
 
 export const toggleFollow = async (req: Request, res: Response) => {
   try {
-    console.log(req.user);
     
     const followerId = req.user?.id as number;
     const followingId = Number(req.params.id);

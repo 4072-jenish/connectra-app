@@ -32,12 +32,10 @@ function Profile() {
     navigate("/editProfile");
   };
 
-  // ✅ FETCH PROFILE
   useEffect(() => {
     dispatch(getProfile(id ? Number(id) : undefined));
   }, [id]);
 
-  // ✅ LOADING
   if (loading) return <p>Loading...</p>;
 
   return (

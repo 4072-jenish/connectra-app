@@ -4,7 +4,6 @@ import postService from "../Services/postService";
 
 export const feedContent = async (req: Request, res: Response) => {
   try {
-    console.log("request from feed controller", req.user?.id);  
     const userId = req.user?.id as number;
 
     const { following } = await followService.getFollowData(userId);

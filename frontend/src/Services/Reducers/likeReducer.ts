@@ -1,13 +1,18 @@
 import { AnyAction } from "redux";
 
-interface LikeState {
-  likes: number;
+interface LikeData {
+  count: number;
   isLiked: boolean;
 }
 
+interface LikeState {
+  likesByPost: {
+    [key: number]: LikeData;
+  };
+}
+
 const initialState: LikeState = {
-  likes: 0,
-  isLiked: false,
+  likesByPost: {},
 };
 
 export const likeReducer = (
@@ -15,20 +20,33 @@ export const likeReducer = (
   action: AnyAction
 ): LikeState => {
   switch (action.type) {
+
     case "GET_LIKES":
       return {
         ...state,
-        likes: action.payload.count,
-        isLiked: action.payload.isLiked,
+        likesByPost: {
+          ...state.likesByPost,
+          [action.postId]: action.payload, 
+        },
       };
 
     case "TOGGLE_LIKE":
+      const current = state.likesByPost[action.postId] || {
+        count: 0,
+        isLiked: false,
+      };
+
       return {
         ...state,
-        isLiked: !state.isLiked,
-        likes: state.isLiked
-          ? state.likes - 1
-          : state.likes + 1,
+        likesByPost: {
+          ...state.likesByPost,
+          [action.postId]: {
+            count: current.isLiked
+              ? current.count - 1
+              : current.count + 1,
+            isLiked: !current.isLiked,
+          },
+        },
       };
 
     default:

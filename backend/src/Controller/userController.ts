@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../prisma";
+import prisma from "../../prisma/prisma";
 import userService from "../Services/userService";
 
 export const getAllUser = async (_: Request, res: Response) => {
@@ -26,11 +26,9 @@ export const singleUser = async (req: Request, res: Response) => {
 
 export const searchUser = async (req: Request, res: Response) => {
   try {
-    console.log("Search User :" ,req.query.search);
     const search = req.query.search as string;
     
     const users = await userService.searchUser(search);
-    console.log(users);
     
     return res.json(users);
   } catch (error) {

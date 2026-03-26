@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authRouter_1 = __importDefault(require("./authRouter"));
+const userRouter_1 = __importDefault(require("./userRouter"));
+const followRouter_1 = __importDefault(require("./followRouter"));
+const postRouter_1 = __importDefault(require("./postRouter"));
+const likeRouter_1 = __importDefault(require("./likeRouter"));
+const commentRouter_1 = __importDefault(require("./commentRouter"));
+const feedRouter_1 = __importDefault(require("./feedRouter"));
+const indexRouter = (0, express_1.Router)();
+indexRouter.use("/auth", authRouter_1.default);
+indexRouter.use("/user", userRouter_1.default);
+indexRouter.use("/follow", followRouter_1.default);
+indexRouter.use("/post", postRouter_1.default);
+indexRouter.use("/like", likeRouter_1.default);
+indexRouter.use("/comment", commentRouter_1.default);
+indexRouter.use("/feed", feedRouter_1.default);
+exports.default = indexRouter;

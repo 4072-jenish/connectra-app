@@ -5,7 +5,6 @@ export const getFollowData = () => async (dispatch: AppDispatch) => {
   try {
     const { data } = await API.get("/follow/getFollowData");
 
-    // Backend returns:
     // { followers: [{ ...followFields, follower: {id,name,email,avatar} }], following: [...] }
     // Frontend expects `followers` to be a flat `User[]`.
     const followersUsers =

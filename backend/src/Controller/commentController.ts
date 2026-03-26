@@ -3,8 +3,7 @@ import commentService from "../Services/commentService";
 
 export const allCommentPost = async (req: Request, res: Response) => {
   try {
-    // This endpoint uses `:id` as `postId` (see `commentRouter`).
-    const postId = req.params.id as unknown as number; // validated by `validateParams`
+    const postId = req.params.id as unknown as number; 
     const comments = await commentService.allCommentOfPost(postId);
     return res.json(comments);
   } catch (error) {
@@ -15,12 +14,10 @@ export const allCommentPost = async (req: Request, res: Response) => {
 
 export const addComment = async (req: Request, res: Response) => {
     try {
-      console.log("From addComment controller",req.user);
   const userId = req.user?.id as number;
   const paramsId = req.params.id as unknown as number;
   const text = req.body.comment as string;
   
-  console.log(userId , paramsId, text);
   
   const comment = await commentService.addComment(
     userId, paramsId, text
@@ -34,8 +31,8 @@ export const addComment = async (req: Request, res: Response) => {
 
 export const editComment = async (req: Request, res: Response) => {
   try {
-    const commentId = req.params.id as unknown as number; // validated by `validateParams`
-    const text = req.body.comment as string; // validated by `validateBody`
+    const commentId = req.params.id as unknown as number; 
+    const text = req.body.comment as string; 
     const comment = await commentService.editCommnet(commentId, text);
     return res.json(comment);
   } catch (error) {
@@ -47,7 +44,7 @@ export const editComment = async (req: Request, res: Response) => {
 export const deleteComment = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id as number;
-    const commentId = req.params.id as unknown as number; // validated by `validateParams`
+    const commentId = req.params.id as unknown as number; 
     await commentService.deleteComment(commentId, userId);
     return res.json({ message: "Deleted" });
   } catch (error) {

@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import prisma from "../../prisma/prisma";
 
  const addLike = async (userId: number, postId: number) => {
   try {
