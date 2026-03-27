@@ -71,7 +71,7 @@ model Follow {
 model Comment {
   id        Int      @id @default(autoincrement())
   text      String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) 
 
   userId    Int
   postId    Int

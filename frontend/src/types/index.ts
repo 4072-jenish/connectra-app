@@ -12,7 +12,7 @@ export interface User {
 
 export interface Comment {
   id: number;
-  text: string;
+  text: [string];
   createdAt: string;
   userId: number;
   user?: {
