@@ -18,82 +18,27 @@ const IndexRouter =  () => {
     <>
         <BrowserRouter>
       <Routes>
-        {/* Public */}
-        <Route
-          path="/"
-          element={
+        <Route path="/" element={
             <PublicRoute>
               <Login />
             </PublicRoute>
           }
         />
 
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-otp" element={<VerifyOTP />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/verify-otp" element={<VerifyOTP />} />
 
-        {/* Private */}
-        <Route
-          path="/feed"
-          element={
-            <ProtectedRoute>
-              <Feed />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/create-post"
-          element={
-            <ProtectedRoute>
-              <CreatePost />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/profile/:id"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/editProfile"
-          element={
-            <ProtectedRoute>
-              <EditProfile />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/search"
-          element={
-            <ProtectedRoute>
-              <Search />
-            </ProtectedRoute>
-          }
-        />
+      <Route element={<ProtectedRoute children={undefined} />}>
+             
+          <Route path="/feed" element={<Feed /> } />
+          <Route path="/create-post"element={<CreatePost />}/>
+          <Route path="/users"element={<Users />}/>
+          <Route path="/profile/:id"element={<Profile />}/>
+          <Route path="/profile"element={<Profile />}/>
+          <Route path="/editProfile"element={<EditProfile />}/>
+          <Route path="/search"element={<Search />}/>
+      </Route>
+       
       </Routes>
     </BrowserRouter>
     </>
